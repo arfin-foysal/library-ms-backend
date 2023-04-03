@@ -22,6 +22,7 @@ class CreateThirdSubCategoriesTable extends Migration
             $table->string('icon_photo')->nullable();
             $table->tinyInteger('sequence')->default(0);
             $table->enum('status',['active','inactive'])->default('active');
+            $table->bigInteger('company_id')->nullable();
             $table->softDeletes();
             $table->foreign('sub_category_id')->references('id')->on('sub_categories');
             $table->timestamps();

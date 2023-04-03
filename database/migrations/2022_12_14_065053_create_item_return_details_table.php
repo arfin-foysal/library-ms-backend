@@ -17,6 +17,7 @@ class CreateItemReturnDetailsTable extends Migration
             $table->id();
             $table->foreignId('item_return_id')->constrained()->onUpdate('cascade')->onDelete('cascade');
             $table->foreignId('item_id')->constrained()->onUpdate('cascade')->onDelete('cascade');
+            $table->bigInteger('company_id')->nullable();
             $table->tinyInteger('item_qty',false,3)->default(0);
             $table->timestamp('return_date')->nullable();
             $table->softDeletes();

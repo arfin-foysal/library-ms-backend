@@ -20,7 +20,7 @@ class CreateItemRentalDetailsTable extends Migration
             $table->tinyInteger('item_qty', false, 3)->default(0);
             $table->timestamp('return_date')->nullable();
             $table->enum('status', ['rental', 'return', 'overdue']);
-
+            $table->bigInteger('company_id')->nullable();
             $table->float('item_amount_of_penalty')->default(0);
             $table->enum('item_payment_status', ['paid', 'due', 'nonamount'])->default('due');
             $table->softDeletes();

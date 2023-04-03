@@ -19,7 +19,7 @@ class CreateItemThumbnailsTable extends Migration
             $table->string('big');
             $table->string('medium')->nullable();
             $table->string('small')->nullable();
-
+            $table->bigInteger('company_id')->nullable();
             $table->enum('status',['active','inactive'])->default('active');
             $table->foreign('item_id')->references('id')->on('items')->cascadeOnDelete();
             $table->softDeletes();

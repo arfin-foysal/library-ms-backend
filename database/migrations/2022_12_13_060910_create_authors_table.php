@@ -26,6 +26,7 @@ class CreateAuthorsTable extends Migration
             $table->enum('is_show',['yes','no'])->default('no');
             $table->enum('status',['active','inactive'])->default('active');
             $table->integer('sequence',false,4)->default(0);
+            $table->bigInteger('company_id')->nullable();
             $table->unsignedBigInteger('created_by', false);
             $table->unsignedBigInteger('updated_by', false)->nullable();
             $table->foreign('created_by')->references('id')->on('users')->cascadeOnDelete();

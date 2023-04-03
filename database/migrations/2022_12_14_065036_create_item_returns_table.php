@@ -20,7 +20,7 @@ class CreateItemReturnsTable extends Migration
             $table->tinyInteger('qty',false,3)->default(0);
             $table->timestamp('return_date')->nullable();
             $table->string('comments',150)->nullable();
-
+            $table->bigInteger('company_id')->nullable();
             $table->unsignedBigInteger('created_by', false);
             $table->unsignedBigInteger('updated_by', false)->nullable();
             $table->foreign('created_by')->references('id')->on('users')->cascadeOnDelete();

@@ -15,12 +15,13 @@ class CreateCategoriesTable extends Migration
     {
         Schema::create('categories', function (Blueprint $table) {
             $table->id();
-            $table->string('name',100)->nullable();
+            $table->string('name', 100)->nullable();
             $table->text('description')->nullable();
             $table->string('icon_photo')->nullable();
             $table->tinyInteger('sequence')->default(0);
-            $table->enum('status',['active','inactive'])->default('active');
-            $table->enum('is_show',['yes','no'])->default('no');
+            $table->enum('status', ['active', 'inactive'])->default('active');
+            $table->enum('is_show', ['yes', 'no'])->default('no');
+            $table->bigInteger('company_id')->nullable();
             $table->softDeletes();
             $table->timestamps();
         });

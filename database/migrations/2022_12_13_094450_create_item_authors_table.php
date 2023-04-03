@@ -17,7 +17,7 @@ class CreateItemAuthorsTable extends Migration
             $table->id();
             $table->foreignId('item_id')->constrained()->onUpdate('cascade')->onDelete('cascade');
             $table->foreignId('author_id')->constrained()->onUpdate('cascade')->onDelete('cascade');
-
+            $table->bigInteger('company_id')->nullable();
             $table->softDeletes();
             $table->timestamps();
         });

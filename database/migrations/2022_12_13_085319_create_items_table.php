@@ -37,6 +37,7 @@ class CreateItemsTable extends Migration
             $table->foreign('third_category_id')->references('id')->on('third_sub_categories')->cascadeOnDelete();
             $table->unsignedBigInteger('created_by', false);
             $table->unsignedBigInteger('updated_by', false)->nullable();
+            $table->bigInteger('company_id')->nullable();
             $table->foreign('created_by')->references('id')->on('users')->cascadeOnDelete();
             $table->foreign('updated_by')->references('id')->on('users')->cascadeOnDelete();
             $table->softDeletes();

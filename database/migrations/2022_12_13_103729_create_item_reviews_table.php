@@ -25,6 +25,7 @@ class CreateItemReviewsTable extends Migration
 
             $table->unsignedBigInteger('created_by', false);
             $table->unsignedBigInteger('updated_by', false)->nullable();
+            $table->bigInteger('company_id')->nullable();
             $table->foreign('item_id')->references('id')->on('items')->cascadeOnDelete();
             $table->foreign('user_id')->references('id')->on('users')->cascadeOnDelete();
             $table->foreign('created_by')->references('id')->on('users')->cascadeOnDelete();

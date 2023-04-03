@@ -30,6 +30,7 @@ class CreateVendorsTable extends Migration
             $table->tinyInteger('sequence',false,4)->default(0);
             $table->unsignedBigInteger('created_by', false);
             $table->unsignedBigInteger('updated_by', false)->nullable();
+            $table->bigInteger('company_id')->nullable();
             $table->foreign('created_by')->references('id')->on('users')->cascadeOnDelete();
             $table->foreign('updated_by')->references('id')->on('users')->cascadeOnDelete();
             $table->softDeletes();

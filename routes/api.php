@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\AuthorController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
@@ -32,6 +33,14 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     // user api
     
 });
+
+
+Route::get('/all-author-list', [AuthorController::class, 'allAuthorList']);
+Route::get('/single-author/{id}', [AuthorController::class, 'singleAuthor']);
+Route::post ('/create-author', [AuthorController::class, 'createAuthor']);
+
+
+
 
 
 
