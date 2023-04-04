@@ -16,7 +16,7 @@ class CreateMembershipPlansTable extends Migration
         Schema::create('membership_plans', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->string('image');
+            $table->string('photo');
             $table->integer('valid_duration', false, 4)->default(0)
                 ->comment('Month wise duration, 0=No duration (I Mean Forever)');
             $table->integer('fee_amount', false, 4)->default(0);

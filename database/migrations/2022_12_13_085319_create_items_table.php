@@ -17,6 +17,7 @@ class CreateItemsTable extends Migration
             $table->id();
             $table->string('title',2500);
             $table->string('isbn',100)->nullable();
+            $table->string('photo')->nullable();
             $table->string('edition',100)->nullable();
             $table->string('number_of_page',50)->nullable();
             $table->text('summary')->nullable();

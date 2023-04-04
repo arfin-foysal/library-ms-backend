@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\AuthorController;
+use App\Http\Controllers\Admin\CategoryController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
@@ -30,14 +31,22 @@ use App\Http\Controllers\Api\AuthController;
 
 
 Route::group(['middleware' => ['auth:sanctum']], function () {
-    // user api
-    
+
+    // Author api
+    Route::get('/all-author-list', [AuthorController::class, 'allAuthorList']);
+    Route::get('/single-author/{id}', [AuthorController::class, 'singleAuthor']);
+    Route::post('/create-or-update-author', [AuthorController::class, 'createOrUpdateAuthor']);
+    Route::delete('/delete-author/{id}', [AuthorController::class, 'deleteAuthor']);
+
+    //Catagory api
+    Route::get('/all-category-list', [CategoryController::class, 'allCategoryList']);
+    Route::get('/single-category/{id}',[CategoryController::class, 'singleCategory']);
+    Route::post('/create-or-update-category', [CategoryController::class, 'createOrUpdateCategory']);
+    Route::delete('/delete-category/{id}', [CategoryController::class, 'deleteCategory']);
 });
 
 
-Route::get('/all-author-list', [AuthorController::class, 'allAuthorList']);
-Route::get('/single-author/{id}', [AuthorController::class, 'singleAuthor']);
-Route::post ('/create-author', [AuthorController::class, 'createAuthor']);
+
 
 
 

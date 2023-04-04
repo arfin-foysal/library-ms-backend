@@ -17,7 +17,7 @@ class CreateCategoriesTable extends Migration
             $table->id();
             $table->string('name', 100)->nullable();
             $table->text('description')->nullable();
-            $table->string('icon_photo')->nullable();
+            $table->string('photo')->nullable();
             $table->tinyInteger('sequence')->default(0);
             $table->enum('status', ['active', 'inactive'])->default('active');
             $table->enum('is_show', ['yes', 'no'])->default('no');

@@ -18,7 +18,7 @@ class CreateSubCategoriesTable extends Migration
             $table->unsignedBigInteger('category_id');
             $table->string('name',100)->nullable();
             $table->text('description')->nullable();
-            $table->string('icon_photo')->nullable();
+            $table->string('photo')->nullable();
             $table->tinyInteger('sequence')->default(0);
             $table->enum('status',['active','inactive'])->default('active');
             $table->bigInteger('company_id')->nullable();
