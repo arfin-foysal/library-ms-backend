@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Language extends Model
 {
-    use HasFactory,SoftDeletes;
+    use HasFactory;
 
     protected $table='languages';
     protected $fillable=['name','sequence','status','created_by','updated_by'];

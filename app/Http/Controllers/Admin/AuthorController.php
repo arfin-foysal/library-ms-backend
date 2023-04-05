@@ -13,17 +13,14 @@ class AuthorController extends Controller
 
 {
     use ApiResponseTrait;
+
     public function allAuthorList()
     {
-
-
         $author = Author::all();
-        return response()->json([
-            'status' => true,
-            'message' => 'Author List',
-            'data' => $author
-        ], 200);
+        return $this->apiResponse($author, 'Author List', true, 200);
     }
+
+
 
     public function createOrUpdateAuthor(Request $request)
     {
@@ -64,12 +61,11 @@ class AuthorController extends Controller
                 $author->created_by = $authId;
                 $author->save();
 
-                return response()->json([
-                    'status' => true,
-                    'message' => 'Author has been added successfully',
-                    'data' => []
-                ], 200);
+                return $this->apiResponse([], 'Author Created Successfully', true, 200);
             } else {
+
+                //Author update
+
                 $authId = Auth::user()->id;
                 $author = Author::findOrFail($request->id);
                 $imageName = "";
@@ -112,11 +108,7 @@ class AuthorController extends Controller
     public function singleAuthor($id)
     {
         $singalAuthor = Author::find($id);
-        return response()->json([
-            'status' => true,
-            'message' => 'Single Author',
-            'data' => $singalAuthor
-        ], 200);
+     return $this->apiResponse($singalAuthor, 'Single Author', true, 200);
     }
 
 
@@ -128,17 +120,10 @@ class AuthorController extends Controller
                 unlink(public_path("images/" . $Author->photo));
             }
             $Author->delete();
-
-            return response()->json([
-                'status' => true,
-                'message' => 'Author Delate Successfully.',
-                'data' => [],
-            ], 200);
+            return $this->apiResponse([], 'Author has been deleted successfully', true, 200);
         } catch (\Throwable $th) {
-            return response()->json([
-                'status' => false,
-                'message' => $th->getMessage()
-            ], 500);
+            //throw $th;
+            return $this->apiResponse([], 'Something went wrong', false, 500);
         }
     }
 }
