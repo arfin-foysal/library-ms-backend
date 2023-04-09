@@ -41,7 +41,7 @@ class MembershipPlansController extends Controller
                 $filename = "";
                 if ($image = $request->file('photo')) {
                     $filename = time() . '-' . uniqid() . '.' . $image->getClientOriginalExtension();
-                    $image->move(public_path('images'), $filename);
+                    $image->move(public_path('images/'), $filename);
                 } else {
                     $filename = Null;
                 }

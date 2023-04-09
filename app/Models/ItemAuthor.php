@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class ItemAuthor extends Model
 {
-    use HasFactory,SoftDeletes;
+    use HasFactory;
 
     protected $table='item_authors';
     protected $fillable=['item_id','author_id'];

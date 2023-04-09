@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\AuthorController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\CounteryController;
+use App\Http\Controllers\Admin\ItemController;
 use App\Http\Controllers\Admin\LanguageController;
 use App\Http\Controllers\Admin\MembershipPlansController;
 use App\Http\Controllers\Admin\PublisherController;
@@ -92,8 +93,10 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::post('create-or-update-user', [UserController::class, 'createOrUpdateUser']);
     Route::delete('delete-user/{id}', [UserController::class, 'deleteUser']);
 
-    
-
+    //Item api
+    Route::get('all-item-list',[ItemController::class,'allItemList']);
+    Route::post('create-or-update-item',[ItemController::class,'createOrUpdateItem']);
+    Route::delete('delete-item/{id}',[ItemController::class,'deleteItem']);
 
 
 });
