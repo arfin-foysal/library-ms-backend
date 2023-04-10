@@ -32,83 +32,83 @@ use App\Http\Controllers\Api\AuthController;
 
 
 
+//Authentaction
+Route::post('/auth/register', [AuthController::class, 'createUser']);
+Route::post('/auth/login', [AuthController::class, 'loginUser']);
 
 
 Route::group(['middleware' => ['auth:sanctum']], function () {
+    Route::prefix('admin')->group(function () {
+        // Author api
+        Route::get('/all-author-list', [AuthorController::class, 'allAuthorList']);
+        Route::get('/single-author/{id}', [AuthorController::class, 'singleAuthor']);
+        Route::post('/create-or-update-author', [AuthorController::class, 'createOrUpdateAuthor']);
+        Route::delete('/delete-author/{id}', [AuthorController::class, 'deleteAuthor']);
 
-    // Author api
-    Route::get('/all-author-list', [AuthorController::class, 'allAuthorList']);
-    Route::get('/single-author/{id}', [AuthorController::class, 'singleAuthor']);
-    Route::post('/create-or-update-author', [AuthorController::class, 'createOrUpdateAuthor']);
-    Route::delete('/delete-author/{id}', [AuthorController::class, 'deleteAuthor']);
+        //Catagory api
+        Route::get('/all-category-list', [CategoryController::class, 'allCategoryList']);
+        Route::get('/single-category/{id}', [CategoryController::class, 'singleCategory']);
+        Route::post('/create-or-update-category', [CategoryController::class, 'createOrUpdateCategory']);
+        Route::delete('/delete-category/{id}', [CategoryController::class, 'deleteCategory']);
 
-    //Catagory api
-    Route::get('/all-category-list', [CategoryController::class, 'allCategoryList']);
-    Route::get('/single-category/{id}', [CategoryController::class, 'singleCategory']);
-    Route::post('/create-or-update-category', [CategoryController::class, 'createOrUpdateCategory']);
-    Route::delete('/delete-category/{id}', [CategoryController::class, 'deleteCategory']);
-
-    //SubCatagory api
-    Route::get('all-sub-category-list', [SubCategoryController::class, 'allSubCategoryList']);
-    Route::get('sub-category-by-category-id/{category_id}', [SubCategoryController::class, 'subCategorybyCategoryId']);
-    Route::post('create-or-update-sub-category', [SubCategoryController::class, 'createOrUpdateSubCategory']);
-    Route::delete('delete-sub-category/{id}', [SubCategoryController::class, 'deleteSubCategory']);
-
-
-
-    //Third Sub Catagory api
-    Route::get('all-third-sub-category-list', [ThirdSubCategoryController::class, 'allThirdSubCategoryList']);
-    Route::get('third-sub-category-by-sub-category-id/{sub_category_id}', [ThirdSubCategoryController::class, 'ThirdSubCategorybySubCategoryId']);
-    Route::post('create-or-update-third-sub-category', [ThirdSubCategoryController::class, 'createOrUpdateThirdSubCategory']);
-    Route::delete('delete-third-sub-category/{id}', [ThirdSubCategoryController::class, 'deleteThirdSubCategory']);
-
-    //Language api
-    Route::get('all-language-list', [LanguageController::class, 'allLanguage']);
-    Route::post('create-or-update-language', [LanguageController::class, 'createOrUpdateLanguage']);
-    Route::delete('delete-language/{id}', [LanguageController::class, 'deleteLanguage']);
-
-    //Country api
-    Route::get('all-countery-list', [CounteryController::class, 'allCounteryList']);
-    Route::post('create-or-update-countery', [CounteryController::class, 'createOrUpdateCountery']);
-    Route::delete('delete-countery/{id}', [CounteryController::class, 'deleteCountery']);
-
-    //Publishar api
-    Route::get('all-publishar-list', [PublisherController::class, 'allPublisharList']);
-    Route::post('create-or-update-publishar', [PublisherController::class, 'createOrUpdatePublishar']);
-    Route::delete('delete-publishar/{id}', [PublisherController::class, 'deletePublishar']);
+        //SubCatagory api
+        Route::get('all-sub-category-list', [SubCategoryController::class, 'allSubCategoryList']);
+        Route::get('sub-category-by-category-id/{category_id}', [SubCategoryController::class, 'subCategorybyCategoryId']);
+        Route::post('create-or-update-sub-category', [SubCategoryController::class, 'createOrUpdateSubCategory']);
+        Route::delete('delete-sub-category/{id}', [SubCategoryController::class, 'deleteSubCategory']);
 
 
-    //Vendor api
-    Route::get('all-vendor-list', [VendorController::class, 'allVendorList']);
-    Route::post('create-or-update-vendor', [VendorController::class, 'createOrUpdateVendor']);
-    Route::delete('delete-vendor/{id}', [VendorController::class, 'deleteVendor']);
 
-    //Membership api
-    Route::get('all-membership-list', [MembershipPlansController::class, 'allMembershipList']);
-    Route::post('create-or-update-membership', [MembershipPlansController::class, 'createOrUpdateMembership']);
-    Route::delete('delete-membership/{id}', [MembershipPlansController::class, 'deleteMembership']);
+        //Third Sub Catagory api
+        Route::get('all-third-sub-category-list', [ThirdSubCategoryController::class, 'allThirdSubCategoryList']);
+        Route::get('third-sub-category-by-sub-category-id/{sub_category_id}', [ThirdSubCategoryController::class, 'ThirdSubCategorybySubCategoryId']);
+        Route::post('create-or-update-third-sub-category', [ThirdSubCategoryController::class, 'createOrUpdateThirdSubCategory']);
+        Route::delete('delete-third-sub-category/{id}', [ThirdSubCategoryController::class, 'deleteThirdSubCategory']);
 
-    //User api
-    Route::get('all-user-list', [UserController::class, 'allUserList']);
-    Route::post('create-or-update-user', [UserController::class, 'createOrUpdateUser']);
-    Route::delete('delete-user/{id}', [UserController::class, 'deleteUser']);
+        //Language api
+        Route::get('all-language-list', [LanguageController::class, 'allLanguage']);
+        Route::post('create-or-update-language', [LanguageController::class, 'createOrUpdateLanguage']);
+        Route::delete('delete-language/{id}', [LanguageController::class, 'deleteLanguage']);
 
-    //Item api
-    Route::get('all-item-list',[ItemController::class,'allItemList']);
-    Route::post('create-or-update-item',[ItemController::class,'createOrUpdateItem']);
-    Route::delete('delete-item/{id}',[ItemController::class,'deleteItem']);
+        //Country api
+        Route::get('all-countery-list', [CounteryController::class, 'allCounteryList']);
+        Route::post('create-or-update-countery', [CounteryController::class, 'createOrUpdateCountery']);
+        Route::delete('delete-countery/{id}', [CounteryController::class, 'deleteCountery']);
+
+        //Publishar api
+        Route::get('all-publishar-list', [PublisherController::class, 'allPublisharList']);
+        Route::post('create-or-update-publishar', [PublisherController::class, 'createOrUpdatePublishar']);
+        Route::delete('delete-publishar/{id}', [PublisherController::class, 'deletePublishar']);
 
 
+        //Vendor api
+        Route::get('all-vendor-list', [VendorController::class, 'allVendorList']);
+        Route::post('create-or-update-vendor', [VendorController::class, 'createOrUpdateVendor']);
+        Route::delete('delete-vendor/{id}', [VendorController::class, 'deleteVendor']);
+
+        //Membership api
+        Route::get('all-membership-list', [MembershipPlansController::class, 'allMembershipList']);
+        Route::post('create-or-update-membership', [MembershipPlansController::class, 'createOrUpdateMembership']);
+        Route::delete('delete-membership/{id}', [MembershipPlansController::class, 'deleteMembership']);
+
+        //User api
+        Route::get('all-user-list', [UserController::class, 'allUserList']);
+        Route::post('create-or-update-user', [UserController::class, 'createOrUpdateUser']);
+        Route::delete('delete-user/{id}', [UserController::class, 'deleteUser']);
+
+        //Item api
+        Route::get('all-item-list', [ItemController::class, 'allItemList']);
+        Route::post('create-or-update-item', [ItemController::class, 'createOrUpdateItem']);
+        Route::delete('delete-item/{id}', [ItemController::class, 'deleteItem']);
+    });
 });
 
 
 
-
-
-
-
-
-
-//Authentaction
-Route::post('/auth/register', [AuthController::class, 'createUser']);
-Route::post('/auth/login', [AuthController::class, 'loginUser']);
+Route::any('{url}', function () {
+    return response()->json([
+        'status' => false,
+        'message' => 'Route Not Found!',
+        'data' => []
+    ], 404);
+})->where('url', '.*');

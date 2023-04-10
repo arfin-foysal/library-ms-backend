@@ -131,11 +131,10 @@ class AuthController extends Controller
             $data = [
                 'status' => true,
                 'message' => 'User Logged In Successfully',
-                'status code' => 200,
                 'user' =>  $response_user
             ];
 
-            return response()->json([$data]);
+            return response()->json($data);
         } catch (\Throwable $th) {
             return response()->json([
                 'status' => false,
