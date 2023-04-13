@@ -14,4 +14,9 @@ class Publisher extends Model
     protected $fillable=['name','email','phone','contact','photo','address1','address2','bio','establish','sequence','status','created_by','updated_by'];
 
 
+    protected $casts = [
+        'is_active' => 'boolean'
+    ];
+
+
 }

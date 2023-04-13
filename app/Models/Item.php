@@ -13,6 +13,9 @@ class Item extends Model
     protected $fillable=['title','isbn','edition','number_of_page','summary','video_url','brochure','publisher_id',
         'language_id','country_id','category_id','sub_category_id','third_category_id','show_home','sequence','status','publish_status','created_by','updated_by'];
 
-
+        protected $casts = [
+            'is_active' => 'boolean'
+            
+        ];
    
 }

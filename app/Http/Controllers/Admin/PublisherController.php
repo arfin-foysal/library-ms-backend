@@ -35,7 +35,7 @@ class PublisherController extends Controller
                     'address1'  => "nullable|max:800",
                     'address2'  => "nullable|max:800",
                     'establish'  => "nullable|max:15",
-                    'status'  => "required",
+                    'is_active'  => "required",
                     'photo' => 'image|mimes:jpeg,jpg,png,gif|nullable|max:8048'
                 ]);
 
@@ -59,7 +59,7 @@ class PublisherController extends Controller
                 $publisher->address1 = $request->address1;
                 $publisher->address2 = $request->address2;
                 $publisher->establish = $request->establish;
-                $publisher->status = $request->status;
+                $publisher->is_active = $request->boolean('is_active');
                 $publisher->bio = $request->bio;
                 $publisher->photo = $filename;
                 $publisher->created_by = $authid;
@@ -75,8 +75,8 @@ class PublisherController extends Controller
                     'address1'  => "nullable|max:800",
                     'address2'  => "nullable|max:800",
                     'establish'  => "nullable|max:15",
-                    'status'  => "required",
-                    'photo' => 'image|mimes:jpeg,jpg,png,gif|nullable|max:8048'
+                    'is_active'  => "required",
+        
                 ]);
                 if ($validator->fails()) {
                     return $this->apiResponse([], $validator->errors()->first(), false, 422);
@@ -103,7 +103,7 @@ class PublisherController extends Controller
                     'address1' => $request->address1,
                     'address2' => $request->address2,
                     'establish' => $request->establish,
-                    'status' => $request->status,
+                    'is_active' => $request->boolean('is_active'),
                     'bio' => $request->bio,
                     'photo' => $imageName,
                     'updated_by' => $authid,

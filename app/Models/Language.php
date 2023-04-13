@@ -13,5 +13,9 @@ class Language extends Model
     protected $table='languages';
     protected $fillable=['name','sequence','status','created_by','updated_by'];
 
+    protected $casts = [
+        'is_active' => 'boolean'
+    ];
+
    
 }

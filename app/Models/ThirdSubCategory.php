@@ -14,6 +14,8 @@ class ThirdSubCategory extends Model
     protected $table='third_sub_categories';
     protected $fillable=['sub_category_id','name','description','icon_photo','sequence','status',];
 
-
+    protected $casts = [
+        'is_active' => 'boolean'
+    ];
 
 }

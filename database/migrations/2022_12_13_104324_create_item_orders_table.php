@@ -23,7 +23,8 @@ class CreateItemOrdersTable extends Migration
             $table->timestamp('tentative_date')->comment('Tentative delivery date');
             $table->foreignId('vendor_id')->nullable()->constrained()->onUpdate('cascade')->onDelete('cascade');
             $table->string('note')->nullable();
-            $table->enum('status',['active','inactive'])->default('active');
+            $table->boolean('is_active')->default(true);
+       
             $table->enum('order_status',['received','unreceived'])->default('unreceived');
             $table->unsignedBigInteger('created_by', false);
             $table->unsignedBigInteger('updated_by', false)->nullable();

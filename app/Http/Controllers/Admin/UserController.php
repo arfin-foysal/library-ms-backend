@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Traits\ApiResponseTrait;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 use PhpParser\Node\Stmt\TryCatch;
 
 class UserController extends Controller
@@ -26,7 +27,7 @@ class UserController extends Controller
 
             if(empty($request->id)){
                 //user create
-                $request->validate([
+                $validator = Validator::make($request->all(),[
                     'name' => 'required|max:100',
                     'email' => 'required|email|unique:users',
                     'password' => 'required|min:6',
@@ -37,6 +38,10 @@ class UserController extends Controller
            
                 
                 ]);
+
+                if ($validator->fails()) {
+                    return $this->apiResponse([], $validator->errors(), false, 422);
+                }
 
                 $filename = "";
                 if ($image = $request->file('profile_photo_path')) {
@@ -60,7 +65,7 @@ class UserController extends Controller
             }else{
 
                 //user update
-                $request->validate([
+                $validator = Validator::make($request->all(),[
                     'name' => 'required|max:100',
                     'email' => 'required|email|unique:users,email,'.$request->id,
                     'status'  => "required",
@@ -70,6 +75,10 @@ class UserController extends Controller
            
                 
                 ]);
+
+                if ($validator->fails()) {
+                    return $this->apiResponse([], $validator->errors(), false, 422);
+                }
 
                 $filename = "";
                 if ($image = $request->file('profile_photo_path')) {

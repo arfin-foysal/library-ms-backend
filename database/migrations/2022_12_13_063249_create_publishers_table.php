@@ -24,7 +24,7 @@ class CreatePublishersTable extends Migration
             $table->text('address2')->nullable();
             $table->text('bio')->nullable();
             $table->timestamp('establish')->nullable();
-            $table->enum('status', ['active', 'inactive'])->default('active');
+            $table->boolean('is_active')->default(true);
             $table->tinyInteger('sequence', false, 4)->default(0);
             $table->unsignedBigInteger('created_by', false);
             $table->unsignedBigInteger('updated_by', false)->nullable();

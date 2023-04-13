@@ -8,10 +8,16 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class SubCategory extends Model
 {
-    use HasFactory,SoftDeletes;
+    use HasFactory;
     
     protected $table='sub_categories';
-    protected $fillable=['category_id','name','description','icon_photo','sequence','status',];
+    
+    protected $fillable=['category_id','name','description','icon_photo','sequence','is_active',];
+
+    protected $casts = [
+        'is_active' => 'boolean'
+    ];
+
 
 
 }

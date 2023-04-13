@@ -21,7 +21,7 @@ return new class extends Migration
             $table->enum('user_role', ['developer', 'super_admin', 'admin', 'librarian', 'general_user'])->default('general_user');
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
-            $table->enum('status', ['active', 'inactive'])->default('active');
+            $table->boolean('is_active')->default(true);
             $table->rememberToken();
             $table->foreignId('current_team_id')->nullable();
             $table->string('profile_photo_path', 2048)->nullable();

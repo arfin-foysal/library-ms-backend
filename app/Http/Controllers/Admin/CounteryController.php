@@ -15,24 +15,19 @@ class CounteryController extends Controller
 
     public function allCounteryList()
     {
-        
+
         $countery = Country::all();
         return $this->apiResponse($countery, 'Country List', true, 200);
     }
 
- 
+
     public function createOrUpdateCountery(Request $request)
     {
         $authId = Auth::user()->id;
-
-
-     
-
-
         if (empty($request->id)) {
             $validator = Validator::make($request->all(), [
                 'name' => 'required',
-                'status' => 'required',
+                'is_active' => 'required',
 
             ]);
 
@@ -42,7 +37,7 @@ class CounteryController extends Controller
 
             $countery = new Country();
             $countery->name = $request->name;
-            $countery->status = $request->status;
+            $countery->is_active = $request->boolean('is_active');
             $countery->created_by = $authId;
             $countery->save();
 
@@ -50,7 +45,7 @@ class CounteryController extends Controller
         } else {
             $validator = Validator::make($request->all(), [
                 'name' => 'required',
-                'status' => 'required',
+                'is_active' => 'required',
             ]);
 
             if ($validator->fails()) {
@@ -59,7 +54,7 @@ class CounteryController extends Controller
 
             $countery = Country::find($request->id);
             $countery->name = $request->name;
-            $countery->status = $request->status;
+            $countery->is_active = $request->boolean('is_active');
             $countery->updated_by = $authId;
             $countery->save();
 
@@ -81,6 +76,5 @@ class CounteryController extends Controller
         $countery = Country::find($id);
         $countery->delete();
         return $this->apiResponse([], 'Country Deleted Successfully', true, 200);
-   
     }
 }

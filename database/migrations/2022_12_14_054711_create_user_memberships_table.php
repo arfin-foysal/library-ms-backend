@@ -18,16 +18,12 @@ class CreateUserMembershipsTable extends Migration
             $table->foreignId('user_id')->constrained()->onUpdate('cascade')->onDelete('cascade');
             $table->foreignId('membership_plan_id')->constrained()->onUpdate('cascade')->onDelete('cascade');
             $table->dateTime('valid_till')->comment('After this date plan will be considered expired');
-
-            $table->enum('status',['active','inactive'])->default('active');
-
-            
+            $table->boolean('is_active')->default(true);
             $table->unsignedBigInteger('created_by', false);
             $table->unsignedBigInteger('updated_by', false)->nullable();
             $table->bigInteger('company_id')->nullable();
             $table->foreign('created_by')->references('id')->on('users')->cascadeOnDelete();
             $table->foreign('updated_by')->references('id')->on('users')->cascadeOnDelete();
-
             $table->softDeletes();
             $table->timestamps();
         });

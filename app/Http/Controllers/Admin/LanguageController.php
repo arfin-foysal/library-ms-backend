@@ -29,7 +29,7 @@ class LanguageController extends Controller
         if (empty($request->id)) {
             $validator = Validator::make($request->all(), [
                 'name' => 'required',
-                'status' => 'required',
+                'is_active' => 'required',
 
             ]);
 
@@ -39,7 +39,7 @@ class LanguageController extends Controller
 
             $language = new Language();
             $language->name = $request->name;
-            $language->status = $request->status;
+            $language->is_active = $request->boolean('is_active');
             $language->created_by = $authId;
             $language->save();
 
@@ -47,7 +47,7 @@ class LanguageController extends Controller
         } else {
             $validator = Validator::make($request->all(), [
                 'name' => 'required',
-                'status' => 'required',
+                'is_active' => 'required',
 
             ]);
 
@@ -57,7 +57,7 @@ class LanguageController extends Controller
 
             $language = Language::find($request->id);
             $language->name = $request->name;
-            $language->status = $request->status;
+            $language->is_active = $request->boolean('is_active');
             $language->updated_by = $authId;
             $language->save();
 

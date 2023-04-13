@@ -21,7 +21,8 @@ class CreateItemReviewsTable extends Migration
             $table->text('content')->nullable();
             $table->tinyInteger('rating',false,3)->default(0);
 
-            $table->enum('status',['active','inactive'])->default('active');
+            $table->boolean('is_active')->default(true);
+        
 
             $table->unsignedBigInteger('created_by', false);
             $table->unsignedBigInteger('updated_by', false)->nullable();

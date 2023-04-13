@@ -10,4 +10,11 @@ class Author extends Model
 {
     use HasFactory;
 
+
+
+
+    protected $casts = [
+        'is_show' => 'boolean',
+        'is_active' => 'boolean'
+    ];
 }

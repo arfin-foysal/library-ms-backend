@@ -8,6 +8,7 @@ use App\Models\Category;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Validator;
 
 class CategoryController extends Controller
 {
@@ -28,14 +29,18 @@ class CategoryController extends Controller
             if (empty($request->id)) {
                 //category create
 
-                $request->validate([
+                $validator = Validator::make($request->all(), [
                     'name' => 'required|max:100',
                     'description' => 'nullable|max:200',
-                    'status'  => "required",
+                    'is_active'  => "required",
                     'is_show'  => "required",
                     'photo' => 'image|mimes:jpeg,jpg,png,gif|nullable'
 
                 ]);
+
+                if ($validator->fails()) {
+                    return $this->apiResponse([], $validator->errors()->first(), false, 403);
+                }
 
                 $imageName = "";
                 if ($image = $request->file('photo')) {
@@ -48,8 +53,8 @@ class CategoryController extends Controller
                 $category = new Category();
                 $category->name = $request->name;
                 $category->description = $request->description;
-                $category->status = $request->status;
-                $category->is_show = $request->is_show;
+                $category->is_active = $request->boolean('is_active');
+                $category->is_show =$request->boolean('is_show');
                 $category->photo = $imageName;
                 $category->save();
 
@@ -62,9 +67,11 @@ class CategoryController extends Controller
                 $category = Category::findOrFail($request->id);
                 $imageName = "";
                 if ($image = $request->file('photo')) {
+                    
                     if ($category->photo) {
                         unlink(public_path("images/" . $category->photo));
                     }
+
                     $imageName = time() . '-' . uniqid() . '.' . $image->getClientOriginalExtension();
                     $image->move(public_path('images'), $imageName);
                 } else {
@@ -74,8 +81,8 @@ class CategoryController extends Controller
                 Category::where('id', $request->id)->update([
                     'name' => $request->name,
                     'description' => $request->description,
-                    'status' => $request->status,
-                    'is_show' => $request->is_show,
+                    'is_active' => $request->boolean('is_active'),
+                    'is_show' => $request->boolean('is_show'),
                     'photo' => $imageName,
 
                 ]);
@@ -110,9 +117,11 @@ class CategoryController extends Controller
 
         try {
             $category = Category::findOrFail($id);
+
             if ($category->photo) {
                 unlink(public_path("images/" . $category->photo));
             }
+            
             $category->delete();
 
             return $this->apiResponse([], 'Category Deleted Successfully', true, 200);

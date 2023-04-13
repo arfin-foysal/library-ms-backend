@@ -23,9 +23,9 @@ class CreateItemsTable extends Migration
             $table->text('summary')->nullable();
             $table->string('video_url')->nullable( );
             $table->string('brochure')->nullable( )->comment('Pdf file');
-            $table->enum('status',['active','inactive'])->default('active');
             $table->tinyInteger('sequence',false,4)->default(0);
-            $table->enum('is_show',['yes','no'])->default('no');
+            $table->boolean('is_active')->default(true);
+            $table->boolean('is_show')->default(true);
             $table->enum('publish_status',['published','unpublished'])->default('unpublished');
             $table->foreignId('publisher_id')->nullable()->constrained()->onUpdate('cascade')->onDelete('cascade');
             $table->foreignId('language_id')->nullable()->constrained()->onUpdate('cascade')->onDelete('cascade');

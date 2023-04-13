@@ -27,7 +27,7 @@ class AuthController extends Controller
                     'name' => 'required',
                     'email' => 'required|email|unique:users,email',
                     // 'username' => 'required|min:4|unique:users,username',
-                    'status' => 'required',
+                    'is_active' => 'required',
                     'phone' => 'required',
                     'user_role' => 'required',
                     'password' => [
@@ -52,7 +52,7 @@ class AuthController extends Controller
                 'email' => $request->email,
                 'user_role' => $request->user_role,
                 'phone' => $request->phone,
-                'status' => $request->status,
+                'is_active' => $request->is_active,
                 'password' => Hash::make($request->password)
 
             ]);
@@ -109,7 +109,7 @@ class AuthController extends Controller
 
 
 
-            if ($user->status !== 'active') {
+            if ($user->is_active !== true) {
                 return response()->json([
                     'status' => false,
                     'message' => 'Your account is not active. Please contact with admin.',

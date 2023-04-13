@@ -22,7 +22,8 @@ class CreateMembershipPlansTable extends Migration
             $table->integer('fee_amount', false, 4)->default(0);
             $table->text('description')->nullable();
             $table->text('term_policy')->nullable();
-            $table->enum('status', ['active', 'inactive'])->default('active');
+            $table->boolean('is_active')->default(true);
+   
             $table->tinyInteger('sequence', false, 4)->default(0);
 
             $table->unsignedBigInteger('created_by', false);

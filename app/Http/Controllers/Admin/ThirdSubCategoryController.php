@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Traits\ApiResponseTrait;
 use App\Models\ThirdSubCategory;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class ThirdSubCategoryController extends Controller
 {
@@ -16,7 +17,9 @@ class ThirdSubCategoryController extends Controller
     public function allThirdSubCategoryList()
     {
 
-        $thirdSubCategory = ThirdSubCategory::get();
+        $thirdSubCategory = ThirdSubCategory::leftJoin("sub_categories","third_sub_categories.sub_category_id","=","sub_categories.id")
+            ->select("third_sub_categories.*","sub_categories.name as sub_category_name")
+            ->get();
         return $this->apiResponse($thirdSubCategory, 'All Third Sub Category List', true, 200);
     }
 
@@ -24,18 +27,19 @@ class ThirdSubCategoryController extends Controller
     public function createOrUpdateThirdSubCategory(Request $request)
     {
         try {
-
-
-
             if (empty($request->id)) {
                 //third sub category create
-                $request->validate([
+                $validator = Validator::make($request->all(),[
                     'name' => 'required|max:100',
                     'description' => 'nullable|max:200',
-                    'status'  => "required",
+                    'is_active'  => "required",
                     'sub_category_id'  => "required",
                     'photo' => 'image|mimes:jpeg,jpg,png,gif|nullable'
                 ]);
+
+                if ($validator->fails()) {
+                    return $this->apiResponse([], $validator->errors()->first(), false, 403);
+                }
 
                 $imageName = "";
                 if ($image = $request->file('photo')) {
@@ -49,19 +53,24 @@ class ThirdSubCategoryController extends Controller
                 $thirdSubCategory->name = $request->name;
                 $thirdSubCategory->sub_category_id = $request->sub_category_id;
                 $thirdSubCategory->description = $request->description;
-                $thirdSubCategory->status = $request->status;
+                $thirdSubCategory->is_active = $request->boolean('is_active');
                 $thirdSubCategory->photo = $imageName;
                 $thirdSubCategory->save();
-
                 return $this->apiResponse([], 'Third Sub Category Created Successfully', true, 200);
+
+
             } else {
                 //third sub category update
-                $request->validate([
-                    'name' => 'required|max:100',
-                    'description' => 'nullable|max:200',
-                    'status'  => "required",
-                    'photo' => 'image|mimes:jpeg,jpg,png,gif|nullable'
-                ]);
+                // $validator = Validator::make($request->all(),[
+                //     'name' => 'required|max:100',
+                //     'description' => 'nullable|max:200',
+                //     'is_active'  => "required",
+                //     'photo' => 'image|mimes:jpeg,jpg,png,gif|nullable'
+                // ]);
+
+                // if ($validator->fails()) {
+                //     return $this->apiResponse([], $validator->errors()->first(), false, 403);
+                // }
 
                 $subCategory = ThirdSubCategory::findOrFail($request->id);
                 $imageName = "";
@@ -79,13 +88,14 @@ class ThirdSubCategoryController extends Controller
                 $thirdSubCategory->name = $request->name;
                 $thirdSubCategory->sub_category_id = $request->sub_category_id;
                 $thirdSubCategory->description = $request->description;
-                $thirdSubCategory->status = $request->status;
+                $thirdSubCategory->is_active = $request->boolean('is_active');
                 $thirdSubCategory->photo = $imageName;
                 $thirdSubCategory->save();
                 return $this->apiResponse([], 'Third Sub Category Updated Successfully', true, 200);
             }
         } catch (\Throwable $th) {
             //throw $th;
+            return $this->apiResponse([], $th->getMessage(), false, 500);
         }
     }
 

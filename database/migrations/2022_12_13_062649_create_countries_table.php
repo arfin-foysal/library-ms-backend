@@ -17,7 +17,7 @@ class CreateCountriesTable extends Migration
             $table->id();
 
             $table->string('name',150);
-            $table->enum('status',['active','inactive'])->default('active');
+            $table->boolean('is_active')->default(true);
             $table->integer('sequence',false,4)->default(0);
             $table->unsignedBigInteger('created_by', false);
             $table->unsignedBigInteger('updated_by', false)->nullable();

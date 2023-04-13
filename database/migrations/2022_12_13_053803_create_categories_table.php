@@ -19,8 +19,8 @@ class CreateCategoriesTable extends Migration
             $table->text('description')->nullable();
             $table->string('photo')->nullable();
             $table->tinyInteger('sequence')->default(0);
-            $table->enum('status', ['active', 'inactive'])->default('active');
-            $table->enum('is_show', ['yes', 'no'])->default('no');
+            $table->boolean('is_active')->default(true);
+            $table->boolean('is_show')->default(true);
             $table->bigInteger('company_id')->nullable();
             $table->softDeletes();
             $table->timestamps();

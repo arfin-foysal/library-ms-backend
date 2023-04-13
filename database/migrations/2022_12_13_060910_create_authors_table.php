@@ -23,8 +23,8 @@ class CreateAuthorsTable extends Migration
             $table->text('address1')->nullable();
             $table->text('address2')->nullable();
             $table->text('bio')->nullable();
-            $table->enum('is_show',['yes','no'])->default('no');
-            $table->enum('status',['active','inactive'])->default('active');
+            $table->boolean('is_active')->default(true);
+            $table->boolean('is_show')->default(true);
             $table->integer('sequence',false,4)->default(0);
             $table->bigInteger('company_id')->nullable();
             $table->unsignedBigInteger('created_by', false);

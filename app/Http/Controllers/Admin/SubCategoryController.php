@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Traits\ApiResponseTrait;
 use App\Models\SubCategory;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
 class SubCategoryController extends Controller
@@ -13,7 +14,10 @@ class SubCategoryController extends Controller
     use ApiResponseTrait;
     public function allSubCategoryList()
     {
-        $subCategory = SubCategory::latest()->get();
+        $subCategory = SubCategory::
+        leftJoin("categories","sub_categories.category_id","=","categories.id")
+        ->select("sub_categories.*","categories.name as category_name")
+        ->get();
         return $this->apiResponse($subCategory, 'Sub Category List', true, 200);
     }
 
@@ -26,13 +30,17 @@ class SubCategoryController extends Controller
 
             if (empty($request->id)) {
                 //sub category create
-                $request->validate([
+                $validator = Validator::make($request->all(),[
                     'name' => 'required|max:100',
                     'description' => 'nullable|max:200',
-                    'status'  => "required",
+                    'is_active'  => "required",
                     'category_id'  => "required",
                     'photo' => 'image|mimes:jpeg,jpg,png,gif|nullable'
                 ]);
+
+                if ($validator->fails()) {
+                    return $this->apiResponse([], $validator->errors()->first(), false, 403);
+                }
 
                 $imageName = "";
                 if ($image = $request->file('photo')) {
@@ -46,19 +54,23 @@ class SubCategoryController extends Controller
                 $subCategory->name = $request->name;
                 $subCategory->category_id = $request->category_id;
                 $subCategory->description = $request->description;
-                $subCategory->status = $request->status;
+                $subCategory->is_active = $request->boolean('is_active');
                 $subCategory->photo = $imageName;
                 $subCategory->save();
 
                 return $this->apiResponse([], 'Sub Category Created Successfully', true, 200);
             } else {
                 //sub category update
-                $request->validate([
-                    'name' => 'required|max:100',
-                    'description' => 'nullable|max:200',
-                    'status'  => "required",
-                    'photo' => 'image|mimes:jpeg,jpg,png,gif|nullable'
-                ]);
+                // $validator = Validator::make($request->all(),[
+                //     'name' => 'required|max:100',
+                //     'description' => 'nullable|max:200',
+                //     'is_active'  => "required",
+                //     'photo' => 'image|mimes:jpeg,jpg,png,gif|nullable'
+                // ]);
+
+                // if ($validator->fails()) {
+                //     return $this->apiResponse([], $validator->errors()->first(), false, 403);
+                // }
 
                 $subCategory = SubCategory::findOrFail($request->id);
                 $imageName = "";
@@ -79,7 +91,7 @@ class SubCategoryController extends Controller
                 $subCategory->name = $request->name;
                 $subCategory->category_id = $request->category_id;
                 $subCategory->description = $request->description;
-                $subCategory->status = $request->status;
+                $subCategory->is_active = $request->boolean('is_active');
                 $subCategory->photo = $imageName;
                 $subCategory->save();
 

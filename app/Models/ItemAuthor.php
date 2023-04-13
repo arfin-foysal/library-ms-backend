@@ -12,4 +12,5 @@ class ItemAuthor extends Model
 
     protected $table='item_authors';
     protected $fillable=['item_id','author_id'];
+
 }

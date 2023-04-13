@@ -7,6 +7,7 @@ use App\Http\Traits\ApiResponseTrait;
 use App\Models\Author;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
 use Spatie\FlareClient\Api;
 
 class AuthorController extends Controller
@@ -28,16 +29,20 @@ class AuthorController extends Controller
             $authId = Auth::user()->id;
             if (empty($request->id)) {
 
-                $request->validate([
+                $validator = Validator::make($request->all(), [
                     'name' => 'required|max:100',
                     'email'  => "nullable|max:80",
                     'mobile'  => "nullable:max:15",
                     'contact'  => "nullable|max:50",
                     'address1'  => "nullable|max:800",
                     'address2'  => "nullable|max:800",
-                    'status'  => "required",
+                    'is_active'  => "required",
                     'photo' => 'image|mimes:jpeg,jpg,png,gif|nullable|max:8048'
                 ]);
+
+                if ($validator->fails()) {
+                    return $this->apiResponse([], $validator->errors()->first(), false, 403);
+                }
 
                 $filename = "";
                 if ($image = $request->file('photo')) {
@@ -46,7 +51,6 @@ class AuthorController extends Controller
                 } else {
                     $filename = Null;
                 }
-
                 $author = new Author();
                 $author->name = $request->name;
                 $author->email = $request->email;
@@ -54,9 +58,9 @@ class AuthorController extends Controller
                 $author->mobile = $request->mobile;
                 $author->address1 = $request->address1;
                 $author->address2 = $request->address2;
-                $author->status = $request->status;
+                $author->is_active = $request->boolean('is_active');
                 $author->bio = $request->bio;
-                $author->is_show = $request->is_show;
+                $author->is_show = $request->boolean('is_show');
                 $author->photo = $filename;
                 $author->created_by = $authId;
                 $author->save();
@@ -76,7 +80,6 @@ class AuthorController extends Controller
                     if ($author->photo) {
                         unlink(public_path("images/" . $author->photo));
                     }
-
                     $imageName = time() . '-' . uniqid() . '.' . $image->getClientOriginalExtension();
                     $image->move(public_path('images'), $imageName);
                 } else {
@@ -90,9 +93,9 @@ class AuthorController extends Controller
                     'mobile' => $request->mobile,
                     'address1' => $request->address1,
                     'address2' => $request->address2,
-                    'status' => $request->status,
+                    'is_active' => $request->boolean('is_active'),
+                    'is_show' => $request->boolean('is_show'),
                     'bio' => $request->bio,
-                    'is_show' => $request->is_show,
                     'photo' => $imageName,
                     'updated_by' => $authId,
                 ]);
@@ -108,7 +111,7 @@ class AuthorController extends Controller
     public function singleAuthor($id)
     {
         $singalAuthor = Author::find($id);
-     return $this->apiResponse($singalAuthor, 'Single Author', true, 200);
+        return $this->apiResponse($singalAuthor, 'Single Author', true, 200);
     }
 
 
