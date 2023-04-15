@@ -16,9 +16,13 @@ class VendorController extends Controller
     public function allVendorList()
     {
 
+        try {
 
-        $vendor = Vendor::select('id', 'name', 'email', 'mobile', 'contact_person', 'contact_person_mobile', 'office_address', 'warehouse_address', 'primary_supply_products', 'status', 'photo')->get();
-        return $this->apiResponse($vendor, 'Vendor List', true, 200);
+            $vendor = Vendor::select('id', 'name', 'email', 'mobile', 'contact_person', 'contact_person_mobile', 'office_address', 'warehouse_address', 'primary_supply_products', 'is_active', 'photo')->get();
+            return $this->apiResponse($vendor, 'Vendor List', true, 200);
+        } catch (\Throwable $th) {
+            return $this->apiResponse([], $th->getMessage(), false, 500);
+        }
     }
 
 
@@ -39,7 +43,7 @@ class VendorController extends Controller
                     'office_address'  => "nullable|max:800",
                     'warehouse_address'  => "nullable|max:800",
                     'primary_supply_products'  => "nullable|max:15",
-                    'status'  => "required",
+                    'is_active'  => "required",
                     'photo' => 'image|mimes:jpeg,jpg,png,gif|nullable|max:8048'
 
                 ]);
@@ -67,7 +71,7 @@ class VendorController extends Controller
                 $vendor->office_address = $request->office_address;
                 $vendor->warehouse_address = $request->warehouse_address;
                 $vendor->primary_supply_products = $request->primary_supply_products;
-                $vendor->status = $request->status;
+                $vendor->is_active = $request->boolean('is_active');
                 $vendor->created_by = $authId;
                 $vendor->photo = $imageName;
                 $vendor->save();
@@ -84,9 +88,7 @@ class VendorController extends Controller
                     'office_address'  => "nullable|max:800",
                     'warehouse_address'  => "nullable|max:800",
                     'primary_supply_products'  => "nullable|max:15",
-                    'status'  => "required",
-
-                    'photo' => 'image|mimes:jpeg,jpg,png,gif|nullable|max:8048'
+                    'is_active'  => "required",
 
                 ]);
 
@@ -117,7 +119,7 @@ class VendorController extends Controller
                     'office_address' => $request->office_address,
                     'warehouse_address' => $request->warehouse_address,
                     'primary_supply_products' => $request->primary_supply_products,
-                    'status' => $request->status,
+                    'is_active' => $request->boolean('is_active'),
                     'photo' => $imageName,
                     'updated_by' => $authId,
                 ]);

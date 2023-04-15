@@ -8,12 +8,15 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Vendor extends Model
 {
-    use HasFactory,SoftDeletes;
+    use HasFactory, SoftDeletes;
 
-    protected $table='vendors';
-    protected $fillable=['name','email','mobile','photo','total_due','balance','contact_person','contact_person_mobile','office_address',
-        'warehouse_address','primary_supply_products','sequence','status','created_by','updated_by'];
+    protected $table = 'vendors';
+    protected $fillable = [
+        'name', 'email', 'mobile', 'photo', 'total_due', 'balance', 'contact_person', 'contact_person_mobile', 'office_address',
+        'warehouse_address', 'primary_supply_products', 'sequence', 'status', 'created_by', 'updated_by'
+    ];
 
-    
-
+    protected $casts = [
+        'is_active' => 'boolean'
+    ];
 }
