@@ -31,7 +31,7 @@ class MembershipPlansController extends Controller
                     'term_policy'  => "nullable",
                     'fee_amount'  => "required|digits_between:1,9",
                     'valid_duration'  => "required|digits_between:0,3",
-                    'status'  => "required",
+                    'is_active'  => "required",
                     'photo' => 'image|mimes:jpeg,jpg,png,gif|nullable|max:8048'
                 ]);
                 if ($validator->fails()) {
@@ -52,7 +52,7 @@ class MembershipPlansController extends Controller
                 $membership->term_policy = $request->term_policy;
                 $membership->fee_amount = $request->fee_amount;
                 $membership->valid_duration = $request->valid_duration;
-                $membership->status = $request->status;
+                $membership->is_active = $request->boolean('is_active');
                 $membership->photo = $filename;
                 $membership->created_by = $authid;
                 $membership->save();
@@ -80,7 +80,7 @@ class MembershipPlansController extends Controller
                     'term_policy' => $request->term_policy,
                     'fee_amount' => $request->fee_amount,
                     'valid_duration' => $request->valid_duration,
-                    'status' => $request->status,
+                    'is_active' => $request->boolean('is_active'),
                     'photo' => $imageName,
                     'updated_by' => $authid,
                 ]);

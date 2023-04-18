@@ -17,8 +17,8 @@ class ThirdSubCategoryController extends Controller
     public function allThirdSubCategoryList()
     {
 
-        $thirdSubCategory = ThirdSubCategory::leftJoin("sub_categories","third_sub_categories.sub_category_id","=","sub_categories.id")
-            ->select("third_sub_categories.*","sub_categories.name as sub_category_name")
+        $thirdSubCategory = ThirdSubCategory::leftJoin("sub_categories", "third_sub_categories.sub_category_id", "=", "sub_categories.id")
+            ->select("third_sub_categories.*", "sub_categories.name as sub_category_name")
             ->get();
         return $this->apiResponse($thirdSubCategory, 'All Third Sub Category List', true, 200);
     }
@@ -29,7 +29,7 @@ class ThirdSubCategoryController extends Controller
         try {
             if (empty($request->id)) {
                 //third sub category create
-                $validator = Validator::make($request->all(),[
+                $validator = Validator::make($request->all(), [
                     'name' => 'required|max:100',
                     'description' => 'nullable|max:200',
                     'is_active'  => "required",
@@ -57,8 +57,6 @@ class ThirdSubCategoryController extends Controller
                 $thirdSubCategory->photo = $imageName;
                 $thirdSubCategory->save();
                 return $this->apiResponse([], 'Third Sub Category Created Successfully', true, 200);
-
-
             } else {
                 //third sub category update
                 // $validator = Validator::make($request->all(),[
@@ -106,13 +104,15 @@ class ThirdSubCategoryController extends Controller
             $subCategoryId = $request->sub_category_id;
 
 
-            $thirdSubCategory = ThirdSubCategory::where('sub_category_id', $subCategoryId)->get();
+            $thirdSubCategory = ThirdSubCategory::where('sub_category_id', $subCategoryId)->leftJoin("sub_categories", "third_sub_categories.sub_category_id", "=", "sub_categories.id")
+                ->select("third_sub_categories.*", "sub_categories.name as sub_category_name")
+                ->get();
 
             return $this->apiResponse($thirdSubCategory, 'Third Sub Category List By Sub Category', true, 200);
         } catch (\Throwable $th) {
             //throw $th;
 
-            return $this->apiResponse([], $th->getMessage() , false, 500);
+            return $this->apiResponse([], $th->getMessage(), false, 500);
         }
     }
 

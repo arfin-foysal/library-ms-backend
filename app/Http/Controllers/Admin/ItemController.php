@@ -16,8 +16,8 @@ class ItemController extends Controller
     use ApiResponseTrait;
     public function allItemList()
     {
-        $items = DB::table('items')
-            ->leftJoin('publishers', 'items.publisher_id', '=', 'publishers.id')
+        $items =item::
+            leftJoin('publishers', 'items.publisher_id', '=', 'publishers.id')
             ->leftJoin('languages', 'items.language_id', '=', 'languages.id')
             ->leftJoin('countries', 'items.country_id', '=', 'countries.id')
             ->leftJoin('categories', 'items.category_id', '=', 'categories.id')
@@ -32,14 +32,16 @@ class ItemController extends Controller
                 'categories.name as categoryName',
                 'sub_categories.name as subCategoryName',
                 'third_sub_categories.name as thirdCategoryName',
-
             )
             ->get();
+
         foreach ($items as $item) {
             $item->authors = ItemAuthor::where('item_id', $item->id)
-                ->select('authors.name as authorName')
+                ->select('authors.name as name', 'authors.id as id')
                 ->leftJoin('authors', 'authors.id', '=', 'item_authors.author_id')->get();
         }
+
+        
         return $this->apiResponse($items, 'Item List', true, 200);
     }
 
@@ -47,6 +49,7 @@ class ItemController extends Controller
     public function createOrUpdateItem(Request $request)
     {
 
+        // return $this->apiResponse($request->all(), 'Item Created Successfully', true, 200);
       
 
         if (empty($request->id)) {
@@ -66,15 +69,15 @@ class ItemController extends Controller
                 'category_id'  => "nullable|exists:categories,id",
                 'sub_category_id'  => "nullable|exists:sub_categories,id",
                 'third_category_id'  => "nullable|exists:third_sub_categories,id",
-                "author_id"   => "required|array|min:1",
-                'author_id.*' => "exists:authors,id",
-                'status'  => "required",
+                // "author_id"   => "required|array|min:1",
+                // 'author_id.*' => "exists:authors,id",
+                'is_active'  => "required",
                 // 'sequence'  => "required",
 
             ]);
 
             if ($validator->fails()) {
-                return $this->apiResponse([], $validator->errors()->first(), false, 403);
+                return $this->apiResponse([], $validator->errors()->first(), false, 409);
             }
             $filename = "";
             if ($image = $request->file('photo')) {
@@ -107,14 +110,18 @@ class ItemController extends Controller
                     $item->language_id = $request->language_id;
                     $item->country_id = $request->country_id;
                     $item->category_id = $request->category_id;
-                    $item->sub_category_id = $request->subcategory_id;
+                    $item->sub_category_id = $request->sub_category_id;
                     $item->third_category_id = $request->third_category_id;
+                    $item->publish_status = $request->publish_status;
                     $item->created_by = auth()->user()->id;
-                    $item->status = $request->status;
+                    $item->is_active = $request->boolean('is_active') ;
+                    $item->is_show = $request->boolean('is_show') ;
                     $item->save();
 
+                    $authorArr = json_decode($request->author_id);
 
-                    foreach ($request->author_id as $key => $value) {
+
+                    foreach ($authorArr as $key => $value) {
                         $itemAuthor = new ItemAuthor();
                         $itemAuthor->item_id = $item->id;
                         $itemAuthor->author_id = $value;
@@ -127,35 +134,35 @@ class ItemController extends Controller
             } catch (\Throwable $th) {
                 DB::rollback();
 
-                return $this->apiResponse([], $th->getMessage(), false, 403);
+                return $this->apiResponse([], $th->getMessage(), false, 500);
             }
         } else {
 
             // ItemAuthor::where('item_id',$itemId)->delete();
-            $validator = Validator::make($request->all(), [
-                'title' => 'required|max:200|unique:items,title,' . $request->id . ',id,deleted_at,NULL',
-                'isbn'  => "nullable|max:100",
-                'photo'  => "nullable|mimes:jpeg,jpg,png|max:10000",
-                'edition'  => "nullable:max:100",
-                'number_of_page'  => "nullable|max:50",
-                'summary'  => "nullable|max:255",
-                'video_url'  => "nullable|max:255",
-                'brochure'  => "nullable|mimes:pdf|max:10000",
-                'publisher_id'  => "nullable|exists:publishers,id",
-                'language_id'  => "nullable|exists:languages,id",
-                'country_id'  => "nullable|exists:countries,id",
-                'category_id'  => "nullable|exists:categories,id",
-                'sub_category_id'  => "nullable|exists:sub_categories,id",
-                'third_category_id'  => "nullable|exists:third_sub_categories,id",
-                "author_id"   => "required|array|min:1",
-                'author_id.*' => "exists:authors,id",
-                'status'  => "required|in:0,1",
-                // 'sequence'  => "required",
+            // $validator = Validator::make($request->all(), [
+            //     'title' => 'required|max:200|unique:items,title,' . $request->id . ',id,deleted_at,NULL',
+            //     'isbn'  => "nullable|max:100",
+            //     // 'photo'  => "nullable|mimes:jpeg,jpg,png|max:10000",
+            //     'edition'  => "nullable:max:100",
+            //     'number_of_page'  => "nullable|max:50",
+            //     'summary'  => "nullable|max:255",
+            //     'video_url'  => "nullable|max:255",
+            //     // 'brochure'  => "nullable|mimes:pdf|max:10000",
+            //     'publisher_id'  => "nullable|exists:publishers,id",
+            //     'language_id'  => "nullable|exists:languages,id",
+            //     'country_id'  => "nullable|exists:countries,id",
+            //     'category_id'  => "nullable|exists:categories,id",
+            //     'sub_category_id'  => "nullable|exists:sub_categories,id",
+            //     'third_category_id'  => "nullable|exists:third_sub_categories,id",
+            //     "author_id"   => "required|min:1",
+            //     'author_id.*' => "exists:authors,id",
+            //     'is_active'  => "required",
+            //     // 'sequence'  => "required",
 
-            ]);
-            if ($validator->fails()) {
-                return $this->apiResponse([], $validator->errors()->first(), false, 403);
-            }
+            // ]);
+            // if ($validator->fails()) {
+            //     return $this->apiResponse([], $validator->errors()->first(), false, 409);
+            // }
 
             $item = Item::findOrFail($request->id);
 
@@ -200,15 +207,20 @@ class ItemController extends Controller
                     $item->language_id = $request->language_id;
                     $item->country_id = $request->country_id;
                     $item->category_id = $request->category_id;
-                    $item->sub_category_id = $request->subcategory_id;
+                    $item->sub_category_id = $request->sub_category_id;
                     $item->third_category_id = $request->third_category_id;
+                    $item->publish_status = $request->publish_status;
                     $item->updated_by = auth()->user()->id;
                     $item->brochure = $brochureFile;
-                    $item->status = $request->status;
+                    $item->is_active = $request->boolean('is_active') ;
+                    $item->is_show = $request->boolean('is_show') ;
                     $item->save();
 
                     ItemAuthor::where('item_id', $item->id)->delete();
-                    foreach ($request->author_id as $key => $value) {
+
+                    $authorArr = json_decode($request->author_id);
+
+                    foreach ($authorArr as $key => $value) {
                         $itemAuthor = new ItemAuthor();
                         $itemAuthor->item_id = $item->id;
                         $itemAuthor->author_id = $value;

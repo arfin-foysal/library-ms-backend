@@ -14,7 +14,8 @@ class Item extends Model
         'language_id','country_id','category_id','sub_category_id','third_category_id','show_home','sequence','status','publish_status','created_by','updated_by'];
 
         protected $casts = [
-            'is_active' => 'boolean'
+            'is_active' => 'boolean',
+            'is_show' => 'boolean',
             
         ];
    

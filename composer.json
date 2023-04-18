@@ -1,8 +1,16 @@
 {
     "name": "laravel/laravel",
     "type": "project",
+    "author": {
+        "name": "arfin foysal",
+        "email": "af.arfinfoysal@gmail.com",
+        "designation": "Software Engineer (Node.js,Laravel,React.js,PHP,JavaScript,,Express.Js,TypeScript,MySql)"
+    },
     "description": "The Laravel Framework.",
-    "keywords": ["framework", "laravel"],
+    "keywords": [
+        "framework",
+        "laravel"
+    ],
     "license": "MIT",
     "require": {
         "php": "^8.0.2",
