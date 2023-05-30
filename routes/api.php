@@ -4,6 +4,9 @@ use App\Http\Controllers\Admin\AuthorController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\CounteryController;
 use App\Http\Controllers\Admin\ItemController;
+use App\Http\Controllers\Admin\ItemOrderController;
+use App\Http\Controllers\Admin\ItemReceiveController;
+use App\Http\Controllers\Admin\ItemRentController;
 use App\Http\Controllers\Admin\LanguageController;
 use App\Http\Controllers\Admin\MembershipPlansController;
 use App\Http\Controllers\Admin\PublisherController;
@@ -83,8 +86,12 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
 
         //Vendor api
         Route::get('all-vendor-list', [VendorController::class, 'allVendorList']);
+        Route::get('vendore-payment-list', [VendorController::class, 'vendorPaymentList']);
         Route::post('create-or-update-vendor', [VendorController::class, 'createOrUpdateVendor']);
         Route::delete('delete-vendor/{id}', [VendorController::class, 'deleteVendor']);
+
+        Route::post('vendor-payment-update', [VendorController::class, 'vendorPaymentUpdate']);
+
 
         //Membership api
         Route::get('all-membership-list', [MembershipPlansController::class, 'allMembershipList']);
@@ -95,12 +102,38 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::get('all-user-list', [UserController::class, 'allUserList']);
         Route::post('create-or-update-user', [UserController::class, 'createOrUpdateUser']);
         Route::delete('delete-user/{id}', [UserController::class, 'deleteUser']);
-        Route::post ('reset-password', [UserController::class, 'passwordReset']);
+        Route::post('reset-password', [UserController::class, 'passwordReset']);
 
         //Item api
         Route::get('all-item-list', [ItemController::class, 'allItemList']);
         Route::post('create-or-update-item', [ItemController::class, 'createOrUpdateItem']);
         Route::delete('delete-item/{id}', [ItemController::class, 'deleteItem']);
+
+        // item order
+        Route::post('item-order', [ItemOrderController::class, 'itemOrder']);
+        Route::get('all-item-order', [ItemOrderController::class, 'itemList']);
+        Route::delete('delete-item-order/{id}', [ItemOrderController::class, 'orderDelete']);
+
+        //Order receved
+        Route::get('unreceved-item-by-order-id/{id}', [ItemReceiveController::class, 'unRecevedItemByOrderId']);
+        Route::post('item-order-receved', [ItemReceiveController::class, 'itemOrderReceve']);
+        Route::get('all-item-receved-list', [ItemReceiveController::class, 'recevedOrderList']);
+
+        //item rents
+        Route::get ('user-list-for-book-issue',[UserController::class,'userListforBookIssue']);
+        Route::post('item-rent-create', [ItemRentController::class, 'itemRentCreate']);
+        Route::get('item-and-available-qty', [ItemRentController::class, 'itemAndAvailableQty']);
+        Route::get('item-rent-list', [ItemRentController::class, 'itemRenstList']);
+        Route::delete('item-rent-delete/{id}', [ItemRentController::class, 'deleteRentsItem']);
+        Route::post('book-rent-active/{id}', [ItemRentController::class, 'bookRentActive']);
+        Route::get('date-expired-item', [ItemRentController::class, 'dateExpiredItem']);
+
+        //item return
+
+        Route::post('item-return', [ItemRentController::class, 'returnItem']);
+
+        //item damage
+        Route::get('item-damage-list', [ItemRentController::class, 'damagedItemList']);
     });
 });
 

@@ -20,6 +20,12 @@ class UserController extends Controller
             ->get();
         return $this->apiResponse($user, 'All User List', true, 200);
     }
+    public function userListforBookIssue()
+    {
+
+        $user = User::get();
+        return $this->apiResponse($user, 'User List for Book Issue', true, 200);
+    }
 
 
     public function createOrUpdateUser(Request $request)

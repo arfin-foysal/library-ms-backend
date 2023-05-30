@@ -4,9 +4,12 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Http\Traits\ApiResponseTrait;
+use App\Models\ItemReceive;
 use App\Models\Vendor;
+use App\Models\VendorPayment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
 class VendorController extends Controller
@@ -150,6 +153,82 @@ class VendorController extends Controller
 
             return $this->apiResponse([], 'Vendor Deleted Successfully', true, 200);
         } catch (\Throwable $th) {
+            return $this->apiResponse([], $th->getMessage(), false, 500);
+        }
+    }
+
+
+    public function vendorPaymentList()
+    {
+
+        try {
+
+            $vendorPayment = VendorPayment::leftJoin('vendors', 'vendor_payments.vendor_id', '=', 'vendors.id')
+                ->leftjoin('item_receives', 'vendor_payments.item_receive_id', '=', 'item_receives.id')
+                ->select(
+                    'vendor_payments.*',
+                    'vendors.name as vendor_name',
+                    'item_receives.invoice_no as invoice_no',
+                    'item_receives.payment_status as payment_status',
+                )
+                ->get();
+
+
+            return $this->apiResponse($vendorPayment, 'Vendor Payment List', true, 200);
+        } catch (\Throwable $th) {
+            return $this->apiResponse([], $th->getMessage(), false, 500);
+        }
+    }
+
+    public function vendorPaymentUpdate(Request $request)
+    {
+        
+     
+        try {
+
+            DB::beginTransaction();
+
+              $vendorPayment=VendorPayment::findOrFail($request->id);
+                $vendorPayment->paid_amount=$request->paid_amount;
+                $vendorPayment->due_amount=$request->due_amount;
+                $vendorPayment->payment_through=$request->payment_through;
+                $vendorPayment->comments=$request->comments;
+                $vendorPayment->updated_by=Auth::user()->id;
+                $vendorPayment->save();
+
+        
+
+                
+
+                    $payableAmount = $vendorPayment->payable_amount;
+                    $dueAmount = $payableAmount - $vendorPayment->paid_amount;
+                    
+                    $paymentStatus = "";
+
+                    if ($dueAmount == 0) {
+                        $paymentStatus = "Paid";
+                    } else {
+                        $paymentStatus = "Due";
+                    }
+
+                    ItemReceive::where('id', $request->item_receive_id)->update([
+                        'payment_status' => $paymentStatus,
+                        'updated_by' => Auth::user()->id,
+                        'paid_amount'=>$vendorPayment->paid_amount,
+                        'due_amount'=>$vendorPayment->due_amount,
+                        
+                    ]);
+                
+
+            
+            DB::commit();
+            return $this->apiResponse($vendorPayment, 'Vendor Payment Updated Successfully', 
+            
+            
+            
+            true, 200);
+        } catch (\Throwable $th) {
+            DB::rollBack();
             return $this->apiResponse([], $th->getMessage(), false, 500);
         }
     }

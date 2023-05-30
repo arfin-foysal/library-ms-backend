@@ -20,8 +20,7 @@ class CreateItemRentalsTable extends Migration
             $table->timestamp('return_date')->nullable();
             $table->tinyInteger('qty')->default(0);
             $table->foreignId('user_id')->constrained()->onUpdate('cascade')->onDelete('cascade');
-
-            $table->enum('status',['active','inactive'])->default('active');
+            $table->enum('status',['active','inactive'])->default('inactive');
             $table->float('amount_of_penalty')->default(0);
             $table->string('note',255)->nullable();
             $table->enum('payment_status',['paid','due'])->default('due');

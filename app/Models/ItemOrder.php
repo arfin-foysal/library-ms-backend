@@ -12,5 +12,11 @@ class ItemOrder extends Model
     
     protected $table='item_orders';
     protected $fillable=['order_no','qty','amount','discount','total','tentative_date','vendor_id','note','status','order_status','created_by','updated_by'];
+    protected $casts = [
+        'is_active' => 'boolean',
+        'is_show' => 'boolean',
+        
+    ];
+
 
 }

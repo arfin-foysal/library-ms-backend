@@ -18,7 +18,7 @@ class CreateVendorPaymentsTable extends Migration
             $table->string('vendor_payment_no',30);
             $table->foreignId('item_receive_id')->nullable()->constrained()->onUpdate('cascade')->onDelete('cascade');
             $table->foreignId('vendor_id')->nullable()->constrained()->onUpdate('cascade')->onDelete('cascade');
-            $table->float('paid_amount',false,8,1)->default(0);
+           
             $table->float('due_amount',false,8,1)->default(0);
             $table->enum('payment_through',['Cash','Bank','Check'])->default('Cash');
             $table->string('payment_photo',255)->nullable();

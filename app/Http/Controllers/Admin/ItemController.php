@@ -16,14 +16,12 @@ class ItemController extends Controller
     use ApiResponseTrait;
     public function allItemList()
     {
-        $items =item::
-            leftJoin('publishers', 'items.publisher_id', '=', 'publishers.id')
+        $items = item::leftJoin('publishers', 'items.publisher_id', '=', 'publishers.id')
             ->leftJoin('languages', 'items.language_id', '=', 'languages.id')
             ->leftJoin('countries', 'items.country_id', '=', 'countries.id')
             ->leftJoin('categories', 'items.category_id', '=', 'categories.id')
             ->leftJoin('sub_categories', 'items.sub_category_id', '=', 'sub_categories.id')
             ->leftJoin('third_sub_categories', 'items.third_category_id', '=', 'third_sub_categories.id')
-
             ->select(
                 'items.*',
                 'publishers.name as publisherName',
@@ -41,7 +39,7 @@ class ItemController extends Controller
                 ->leftJoin('authors', 'authors.id', '=', 'item_authors.author_id')->get();
         }
 
-        
+
         return $this->apiResponse($items, 'Item List', true, 200);
     }
 
@@ -50,7 +48,7 @@ class ItemController extends Controller
     {
 
         // return $this->apiResponse($request->all(), 'Item Created Successfully', true, 200);
-      
+
 
         if (empty($request->id)) {
 
@@ -69,10 +67,10 @@ class ItemController extends Controller
                 'category_id'  => "nullable|exists:categories,id",
                 'sub_category_id'  => "nullable|exists:sub_categories,id",
                 'third_category_id'  => "nullable|exists:third_sub_categories,id",
-                // "author_id"   => "required|array|min:1",
-                // 'author_id.*' => "exists:authors,id",
+                'item_type'  => "required|in:physical,virtual",
                 'is_active'  => "required",
-                // 'sequence'  => "required",
+                'is_free'  => "required",
+
 
             ]);
 
@@ -114,8 +112,10 @@ class ItemController extends Controller
                     $item->third_category_id = $request->third_category_id;
                     $item->publish_status = $request->publish_status;
                     $item->created_by = auth()->user()->id;
-                    $item->is_active = $request->boolean('is_active') ;
-                    $item->is_show = $request->boolean('is_show') ;
+                    $item->is_active = $request->boolean('is_active');
+                    $item->is_show = $request->boolean('is_show');
+                    $item->item_type = $request->item_type;
+                    $item->is_free = $request->is_free;
                     $item->save();
 
                     $authorArr = json_decode($request->author_id);
@@ -212,8 +212,10 @@ class ItemController extends Controller
                     $item->publish_status = $request->publish_status;
                     $item->updated_by = auth()->user()->id;
                     $item->brochure = $brochureFile;
-                    $item->is_active = $request->boolean('is_active') ;
-                    $item->is_show = $request->boolean('is_show') ;
+                    $item->is_active = $request->boolean('is_active');
+                    $item->is_show = $request->boolean('is_show');
+                    $item->item_type = $request->item_type;
+                    $item->is_free = $request->is_free;
                     $item->save();
 
                     ItemAuthor::where('item_id', $item->id)->delete();
