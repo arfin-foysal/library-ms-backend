@@ -123,6 +123,7 @@ class AuthController extends Controller
                 'phone' => $user->phone,
                 'email' => $user->email,
                 'user_role' => $user->user_role,
+                'image'=>$user->image,
                 'token' => $user->createToken("API TOKEN")->plainTextToken
             ];
 
