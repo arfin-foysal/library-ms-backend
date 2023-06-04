@@ -291,7 +291,6 @@ class ItemRentController extends Controller
                     'users.name as user_name',
                     'users.profile_photo_path as user_photo',
                 )
-
                  ->get();
 
                 return $this ->apiResponse($itemDamagedList, 'Item Damaged List', true, 200);

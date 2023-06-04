@@ -116,6 +116,7 @@ class ItemController extends Controller
                     $item->is_show = $request->boolean('is_show');
                     $item->item_type = $request->item_type;
                     $item->is_free = $request->is_free;
+                    $item->publish_date = $request->publish_date;
                     $item->save();
 
                     $authorArr = json_decode($request->author_id);
@@ -216,6 +217,7 @@ class ItemController extends Controller
                     $item->is_show = $request->boolean('is_show');
                     $item->item_type = $request->item_type;
                     $item->is_free = $request->is_free;
+                    $item->publish_date = $request->publish_date;
                     $item->save();
 
                     ItemAuthor::where('item_id', $item->id)->delete();

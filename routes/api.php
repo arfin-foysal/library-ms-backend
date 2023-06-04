@@ -17,9 +17,7 @@ use App\Http\Controllers\Admin\VendorController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
-
-
-
+use App\Http\Controllers\Client\ClientController;
 
 /*
 |--------------------------------------------------------------------------
@@ -35,7 +33,7 @@ use App\Http\Controllers\Api\AuthController;
 
 
 
-//Authentaction
+//auth api
 Route::post('/auth/register', [AuthController::class, 'createUser']);
 Route::post('/auth/login', [AuthController::class, 'loginUser']);
 
@@ -120,7 +118,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::get('all-item-receved-list', [ItemReceiveController::class, 'recevedOrderList']);
 
         //item rents
-        Route::get ('user-list-for-book-issue',[UserController::class,'userListforBookIssue']);
+        Route::get('user-list-for-book-issue', [UserController::class, 'userListforBookIssue']);
         Route::post('item-rent-create', [ItemRentController::class, 'itemRentCreate']);
         Route::get('item-and-available-qty', [ItemRentController::class, 'itemAndAvailableQty']);
         Route::get('item-rent-list', [ItemRentController::class, 'itemRenstList']);
@@ -136,7 +134,10 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::get('item-damage-list', [ItemRentController::class, 'damagedItemList']);
     });
 });
+Route::prefix('client')->group(function () {
 
+    Route::get("get-all-item", [ClientController::class, 'getAllBook']);
+});
 
 
 Route::any('{url}', function () {
