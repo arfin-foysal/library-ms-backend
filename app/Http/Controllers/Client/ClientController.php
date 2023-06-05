@@ -15,7 +15,6 @@ class ClientController extends Controller
     public function getAllBook()
     {
         $items = Item::
-            //  leftJoin('authors','authors.id','=','items.author_id')
             leftJoin('categories', 'categories.id', '=', 'items.category_id')
             ->leftJoin('publishers', 'publishers.id', '=', 'items.publisher_id')
             ->leftJoin('countries', 'countries.id', '=', 'items.country_id')

@@ -48,8 +48,6 @@ class ItemRentController extends Controller
 
     public function itemRentCreate(Request $request)
     {
-
-
         DB::beginTransaction();
         try {
 
@@ -78,7 +76,6 @@ class ItemRentController extends Controller
 
 
                 $itemInventoryStock = ItemInventoryStock::where('item_id', $value['item_id'])->first();
-
                 //stack qty not less than 0
                 if ($itemInventoryStock->qty < $value['item_qty']) {
                     DB::rollback();
@@ -259,10 +256,6 @@ class ItemRentController extends Controller
 
 
                 )->get();
-
-
-
-
         } catch (\Throwable $th) {
             return $this->apiResponse([], $th->getMessage(), false, 500);
         }
@@ -271,7 +264,8 @@ class ItemRentController extends Controller
 
 
 
-    public function damagedItemList(){
+    public function damagedItemList()
+    {
 
         try {
             $itemDamagedList = ItemRentalDetail::where([['item_rental_details.status', 'damaged']])
@@ -291,16 +285,11 @@ class ItemRentController extends Controller
                     'users.name as user_name',
                     'users.profile_photo_path as user_photo',
                 )
-                 ->get();
+                ->get();
 
-                return $this ->apiResponse($itemDamagedList, 'Item Damaged List', true, 200);
-                
+            return $this->apiResponse($itemDamagedList, 'Item Damaged List', true, 200);
         } catch (\Throwable $th) {
             return $this->apiResponse([], $th->getMessage(), false, 500);
-       
         }
-
     }
-
-
 }

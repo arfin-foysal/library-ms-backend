@@ -207,9 +207,9 @@ class ItemController extends Controller
                     $item->publisher_id = $request->publisher_id;
                     $item->language_id = $request->language_id;
                     $item->country_id = $request->country_id;
-                    $item->category_id = $request->category_id;
-                    $item->sub_category_id = $request->sub_category_id;
-                    $item->third_category_id = $request->third_category_id;
+                    // $item->category_id = $request->category_id;
+                    // $item->sub_category_id = $request->sub_category_id;
+                    // $item->third_category_id = $request->third_category_id;
                     $item->publish_status = $request->publish_status;
                     $item->updated_by = auth()->user()->id;
                     $item->brochure = $brochureFile;
