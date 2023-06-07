@@ -36,6 +36,8 @@ use App\Http\Controllers\Client\ClientController;
 //auth api
 Route::post('/auth/register', [AuthController::class, 'createUser']);
 Route::post('/auth/login', [AuthController::class, 'loginUser']);
+Route::post('/auth/client-login', [AuthController::class, 'clientLogin']);
+
 
 
 Route::group(['middleware' => ['auth:sanctum']], function () {
@@ -136,7 +138,10 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
 });
 Route::prefix('client')->group(function () {
 
+
     Route::get("get-all-item", [ClientController::class, 'getAllBook']);
+    Route::get("get-item-by-id/{id}", [ClientController::class, 'getItemById']);
+    Route::get("get-author-and-item", [ClientController::class, 'authorDetailsAndBook']);
 });
 
 

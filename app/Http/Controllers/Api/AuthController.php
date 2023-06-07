@@ -143,4 +143,73 @@ class AuthController extends Controller
             ], 500);
         }
     }
+    public function clientLogin(Request $request)
+    {
+
+        try {
+            $validateUser = Validator::make(
+                $request->all(),
+                [
+                    'email' => 'required|email',
+                    'password' => 'required'
+                ]
+            );
+
+            if ($validateUser->fails()) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'validation error',
+                    'errors' => $validateUser->errors()
+                ], 401);
+            }
+
+            if (!Auth::attempt($request->only(['email', 'password']))) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Email & Password does not match with our record.',
+                    'data' => []
+                ], 401);
+            }
+            $user = User::where('email', $request->email)->first();
+
+          
+
+
+
+
+
+            if ($user->is_active !== true) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Your account is not active. Please contact with admin.',
+                    'data' => []
+                ], 401);
+            }
+
+            $response_user = [
+                'id' => $user->id,
+                'name' => $user->name,
+                'phone' => $user->phone,
+                'email' => $user->email,
+                'user_role' => $user->user_role,
+                'image'=>$user->image,
+                'token' => $user->createToken("API TOKEN")->plainTextToken
+            ];
+
+
+
+            $data = [
+                'status' => true,
+                'message' => 'User Logged In Successfully',
+                'user' =>  $response_user
+            ];
+
+            return response()->json($data);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => false,
+                'message' => $th->getMessage()
+            ], 500);
+        }
+    }
 }

@@ -70,6 +70,7 @@ class ItemController extends Controller
                 'item_type'  => "required|in:physical,virtual",
                 'is_active'  => "required",
                 'is_free'  => "required",
+                'publish_status'  => "required",
 
 
             ]);
