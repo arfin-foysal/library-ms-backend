@@ -7,7 +7,11 @@ use App\Http\Traits\ApiResponseTrait;
 use App\Models\Author;
 use App\Models\Item;
 use App\Models\ItemAuthor;
+use App\Models\ItemRental;
+use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use PhpParser\Node\Stmt\TryCatch;
 
 class ClientController extends Controller
 {
@@ -125,11 +129,87 @@ class ClientController extends Controller
     }
 
 
-
-
-
-    public function destroy($id)
+    public function singleUser()
     {
-        //
+        try {
+            $user = User::where('id', Auth::user()->id)->first();
+            return $this->apiResponse($user, 'user', true, 200);
+        } catch (\Throwable $th) {
+            return $this->apiResponse('', $th->getMessage(), true, 200);
+        }
+    }
+
+    public function profileUpdate(Request $request)
+    {
+
+        try {
+
+            $user = User::where('id', Auth::user()->id)->first();
+            $request->validate([
+                'name' => 'required',
+                'email' => 'required|email|unique:users,email,' . $user->id,
+                'username' => 'min:4|unique:users,username,' . $user->id,
+
+            ]);
+            $imageName = "";
+            if ($image = $request->file('profile_photo_path')) {
+                if ($user->profile_photo_path) {
+                    unlink(public_path("images/" . $user->profile_photo_path));
+                }
+
+                $imageName = time() . '-' . uniqid() . '.' . $image->getClientOriginalExtension();
+                $image->move(public_path('images'), $imageName);
+            } else {
+                $imageName = $user->profile_photo_path;
+            }
+
+            $user->name = $request->name;
+            $user->email = $request->email;
+            $user->username = $request->username;
+            $user->phone = $request->phone;
+            $user->location = $request->location;
+            $user->description = $request->description;
+            $user->gender = $request->gender;
+            $user->profile_photo_path = $imageName;
+            $user->save();
+
+
+            return $this->apiResponse([], 'Profile Update Successfully.', true, 200);
+        } catch (\Throwable $th) {
+            return $this->apiResponse([], $th->getMessage(), false, 200);
+        }
+    }
+
+
+    public function rentItemByUser()
+    {
+
+        //rent item get by login user 
+
+        $items = ItemRental::where('user_id', 2)
+            ->leftJoin('item_rental_details', 'item_rental_details.item_rental_id', '=', 'item_rentals.id')
+            ->leftJoin('items', 'items.id', '=', 'item_rental_details.item_id')
+            ->select(
+                'items.id as id',
+                'items.title as title',
+                'items.photo as photo',
+                'item_rentals.rental_date as rental_date',
+
+
+            )->get();
+
+        $items->each(function ($item) {
+            $item->authors = ItemAuthor::where('item_id', $item->id)
+                ->leftJoin('authors', 'authors.id', '=', 'item_authors.author_id')
+                ->select(
+                    'authors.name as name',
+
+
+                )
+                ->get();
+        });
+
+
+        return $this->apiResponse($items, 'all Book item', true, 200);
     }
 }

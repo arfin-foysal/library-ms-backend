@@ -137,15 +137,16 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     });
 });
 Route::prefix('client')->group(function () {
-
-
     Route::get("get-all-item", [ClientController::class, 'getAllBook']);
     Route::get("get-item-by-id/{id}", [ClientController::class, 'getItemById']);
     Route::get("get-author-and-item", [ClientController::class, 'authorDetailsAndBook']);
+    Route::get("single-user", [ClientController::class, 'singleUser'])->middleware(['auth:sanctum']);
+    Route::post("profile-update", [ClientController::class, 'profileUpdate'])->middleware(['auth:sanctum']);
+    Route::get("rent-item-by-user", [ClientController::class, 'rentItemByUser']);
 });
 
 
-Route::any('{url}', function () {
+Route::any('{url}', function () {;
     return response()->json([
         'status' => false,
         'message' => 'Route Not Found!',
