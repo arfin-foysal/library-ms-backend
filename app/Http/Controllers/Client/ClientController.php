@@ -17,16 +17,18 @@ class ClientController extends Controller
 {
     use ApiResponseTrait;
 
-    public function getAllBook()
+    public function getAllBook(Request $request)
     {
-        $items = Item::leftJoin('categories', 'categories.id', '=', 'items.category_id')
 
-            ->select(
-                'items.*',
-                'categories.name as category_name',
+        $page = 0;
+        $limit = $request->limit;
+        $items = Item::select(
+            'items.*',
+            'categories.name as category_name',
+        )
+            ->leftJoin('categories', 'categories.id', '=', 'items.category_id')
+            ->orderBy('updated_at', 'desc')->paginate($limit, ['*'], 'page', $page);
 
-            )
-            ->get();
         foreach ($items as $item) {
             $item->authors = ItemAuthor::where('item_id', $item->id)
                 ->leftJoin('authors', 'authors.id', '=', 'item_authors.author_id')
@@ -42,6 +44,33 @@ class ClientController extends Controller
 
         return $this->apiResponse($items, 'all Book item', true, 200);
     }
+    public function getHomePageBook(Request $request)
+    { {
+
+            $items = Item::select(
+                'items.*',
+                'categories.name as category_name',
+            )
+                ->leftJoin('categories', 'categories.id', '=', 'items.category_id')
+                ->latest()->limit(10)->get();
+
+            foreach ($items as $item) {
+                $item->authors = ItemAuthor::where('item_id', $item->id)
+                    ->leftJoin('authors', 'authors.id', '=', 'item_authors.author_id')
+                    ->select(
+                        'authors.name as name',
+                        'authors.id as id',
+                        'authors.photo as author_photo',
+                        'authors.bio as author_bio'
+
+                    )
+                    ->get();
+            }
+
+            return $this->apiResponse($items, 'Book item', true, 200);
+        }
+    }
+
 
 
     public function getItemById($id)
@@ -186,7 +215,7 @@ class ClientController extends Controller
 
         //rent item get by login user 
 
-        $items = ItemRental::where('user_id', 2)
+        $items = ItemRental::where('user_id', Auth::user()->id)
             ->leftJoin('item_rental_details', 'item_rental_details.item_rental_id', '=', 'item_rentals.id')
             ->leftJoin('items', 'items.id', '=', 'item_rental_details.item_id')
             ->select(
@@ -211,5 +240,31 @@ class ClientController extends Controller
 
 
         return $this->apiResponse($items, 'all Book item', true, 200);
+    }
+
+    public function pendingOrderList()
+    {
+        $items = ItemRental::where('item_rentals.status', 'inactive')
+            ->leftJoin('item_rental_details', 'item_rental_details.item_rental_id', '=', 'item_rentals.id')
+            ->leftJoin('items', 'items.id', '=', 'item_rental_details.item_id')
+            ->select(
+                'items.id as id',
+                'items.title as title',
+                'items.photo as photo',
+                'item_rentals.rental_date as rental_date',
+
+
+            )->get();
+
+        $items->each(function ($item) {
+            $item->authors = ItemAuthor::where('item_authors.item_id', $item->id)
+                ->leftJoin('authors', 'authors.id', '=', 'item_authors.author_id')
+                ->select(
+                    'authors.name as name',
+                )
+                ->get();
+        });
+
+        return $this->apiResponse($items, 'All Pending Book item', true, 200);
     }
 }

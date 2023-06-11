@@ -73,11 +73,13 @@ class ItemController extends Controller
                 'publish_status'  => "required",
 
 
+
             ]);
 
             if ($validator->fails()) {
                 return $this->apiResponse([], $validator->errors()->first(), false, 409);
             }
+            
             $filename = "";
             if ($image = $request->file('photo')) {
                 $filename = time() . '-' . uniqid() . '.' . $image->getClientOriginalExtension();
@@ -93,9 +95,23 @@ class ItemController extends Controller
             } else {
                 $brochure = Null;
             }
+
+            $virtual_book = "";
+            if ($image = $request->file('virtual_book')) {
+                $virtual_book = time() . '-' . uniqid() . '.' . $image->getClientOriginalExtension();
+                $image->move(public_path('file/'), $virtual_book);
+            } else {
+                $virtual_book = Null;
+            }
+
+
+
             try {
 
-                DB::transaction(function () use ($request, $filename, $brochure) {
+
+                
+
+                DB::transaction(function () use ($request, $filename, $brochure,$virtual_book) {
                     $item = new Item();
                     $item->title = $request->title;
                     $item->isbn = $request->isbn;
@@ -105,6 +121,7 @@ class ItemController extends Controller
                     $item->summary = $request->summary;
                     $item->video_url = $request->video_url;
                     $item->brochure = $brochure;
+                    $item->virtual_book = $virtual_book;
                     $item->publisher_id = $request->publisher_id;
                     $item->language_id = $request->language_id;
                     $item->country_id = $request->country_id;
@@ -118,6 +135,7 @@ class ItemController extends Controller
                     $item->item_type = $request->item_type;
                     $item->is_free = $request->is_free;
                     $item->publish_date = $request->publish_date;
+             
                     $item->save();
 
                     $authorArr = json_decode($request->author_id);
