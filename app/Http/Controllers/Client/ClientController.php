@@ -81,12 +81,14 @@ class ClientController extends Controller
             ->leftJoin('publishers', 'publishers.id', '=', 'items.publisher_id')
             ->leftJoin('countries', 'countries.id', '=', 'items.country_id')
             ->leftJoin('languages', 'languages.id', '=', 'items.language_id')
+            ->leftJoin('item_inventory_stocks', 'item_inventory_stocks.item_id', '=', 'items.id')
             ->select(
                 'items.*',
                 'categories.name as category_name',
                 'publishers.name as publisher_name',
                 'countries.name as country_name',
                 'languages.name as language_name',
+                'item_inventory_stocks.qty as qty',
             )
 
             ->first();

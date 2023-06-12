@@ -145,6 +145,7 @@ Route::prefix('client')->group(function () {
     Route::post("profile-update", [ClientController::class, 'profileUpdate'])->middleware(['auth:sanctum']);
     Route::get("rent-item-by-user", [ClientController::class, 'rentItemByUser'])->middleware(['auth:sanctum']);
     Route::get("pending-order-list", [ClientController::class, 'pendingOrderList'])->middleware(['auth:sanctum']);
+    Route::post("item-rent-create-client", [ItemRentController::class, 'itemRentCreate'])->middleware(['auth:sanctum']);
 });
 
 

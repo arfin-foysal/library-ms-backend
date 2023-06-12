@@ -48,6 +48,8 @@ class ItemRentController extends Controller
 
     public function itemRentCreate(Request $request)
     {
+        // return $request->all();
+
         DB::beginTransaction();
         try {
 
