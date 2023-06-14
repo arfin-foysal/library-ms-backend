@@ -18,6 +18,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Client\ClientController;
+use App\Models\User;
+use Illuminate\Support\Facades\Log;
 
 /*
 |--------------------------------------------------------------------------
@@ -129,15 +131,15 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::get('date-expired-item', [ItemRentController::class, 'dateExpiredItem']);
 
         //item return
-
         Route::post('item-return', [ItemRentController::class, 'returnItem']);
-
         //item damage
         Route::get('item-damage-list', [ItemRentController::class, 'damagedItemList']);
     });
 });
 Route::prefix('client')->group(function () {
+
     Route::get("get-all-item", [ClientController::class, 'getAllBook']);
+
     Route::get("get-home-page-book", [ClientController::class, 'getHomePageBook']);
     Route::get("get-item-by-id/{id}", [ClientController::class, 'getItemById']);
     Route::get("get-author-and-item", [ClientController::class, 'authorDetailsAndBook']);
@@ -146,6 +148,12 @@ Route::prefix('client')->group(function () {
     Route::get("rent-item-by-user", [ClientController::class, 'rentItemByUser'])->middleware(['auth:sanctum']);
     Route::get("pending-order-list", [ClientController::class, 'pendingOrderList'])->middleware(['auth:sanctum']);
     Route::post("item-rent-create-client", [ItemRentController::class, 'itemRentCreate'])->middleware(['auth:sanctum']);
+    Route::get("item-return-time-expired", [ClientController::class, 'ItemReturnTimeExpired'])->middleware(['auth:sanctum']);
+});
+
+
+Route::get('test', function () {
+    return "test";
 });
 
 

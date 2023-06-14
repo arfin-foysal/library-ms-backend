@@ -9,6 +9,7 @@ use App\Models\Item;
 use App\Models\ItemAuthor;
 use App\Models\ItemRental;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use PhpParser\Node\Stmt\TryCatch;
@@ -247,6 +248,7 @@ class ClientController extends Controller
     public function pendingOrderList()
     {
         $items = ItemRental::where('item_rentals.status', 'inactive')
+            ->where('item_rentals.user_id', Auth::user()->id)
             ->leftJoin('item_rental_details', 'item_rental_details.item_rental_id', '=', 'item_rentals.id')
             ->leftJoin('items', 'items.id', '=', 'item_rental_details.item_id')
             ->select(
@@ -268,5 +270,25 @@ class ClientController extends Controller
         });
 
         return $this->apiResponse($items, 'All Pending Book item', true, 200);
+    }
+
+
+    public function ItemReturnTimeExpired()
+    {
+
+        $items = ItemRental::where('item_rentals.user_id', Auth::user()->id)
+
+            ->leftJoin('item_rental_details', 'item_rental_details.item_rental_id', '=', 'item_rentals.id')
+            ->where([['item_rental_details.return_date', '<', Carbon::now()], ['item_rental_details.status', 'rental']])
+            ->leftJoin('items', 'items.id', '=', 'item_rental_details.item_id')
+            ->select(
+                'items.id as id',
+                'items.title as title',
+                'items.photo as photo',
+                'item_rentals.rental_date as rental_date',
+                'item_rental_details.return_date as return_date',
+            )
+            ->get();
+            return $this->apiResponse($items, 'All Pending Book item', true, 200);
     }
 }
