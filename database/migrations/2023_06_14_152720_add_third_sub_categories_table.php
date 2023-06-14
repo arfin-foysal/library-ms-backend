@@ -13,8 +13,9 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::table('items', function (Blueprint $table) {
-            $table->float('price', 8, 1)->default(0)->after('isbn');
+        Schema::table('third_sub_categories', function (Blueprint $table) {
+            $table->unsignedBigInteger('category_id')->nullable()->after('sub_category_id');
+            $table->foreign('category_id')->references('id')->on('categories');
         });
     }
 
@@ -25,8 +26,8 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::table('items', function (Blueprint $table) {
-   
+        Schema::table('third_sub_categories', function (Blueprint $table) {
+            //
         });
     }
 };

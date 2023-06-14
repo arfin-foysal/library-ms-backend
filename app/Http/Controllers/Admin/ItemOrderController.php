@@ -108,8 +108,10 @@ class ItemOrderController extends Controller
 
         try {
             $itemOrder = ItemOrder::find($id);
+            $itemOrderDetail = ItemOrderDetail::where('item_order_id', $id)->get();
             if ($itemOrder) {
                 $itemOrder->delete();
+                $itemOrderDetail->delete();
                 return $this->apiResponse([], 'Item Order Deleted Successfully', true, 200);
             } else {
                 return $this->apiResponse([], 'Item Order Not Found', false, 404);
