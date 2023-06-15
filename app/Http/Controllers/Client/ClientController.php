@@ -83,6 +83,7 @@ class ClientController extends Controller
             ->leftJoin('countries', 'countries.id', '=', 'items.country_id')
             ->leftJoin('languages', 'languages.id', '=', 'items.language_id')
             ->leftJoin('item_inventory_stocks', 'item_inventory_stocks.item_id', '=', 'items.id')
+
             ->select(
                 'items.*',
                 'categories.name as category_name',
@@ -289,6 +290,12 @@ class ClientController extends Controller
                 'item_rental_details.return_date as return_date',
             )
             ->get();
-            return $this->apiResponse($items, 'All Pending Book item', true, 200);
+        return $this->apiResponse($items, 'All Pending Book item', true, 200);
+    }
+
+    public function virtualItemView($id)
+    {
+        $item = Item::where('id', $id)->select('id', 'virtual_book')->first();
+        return $this->apiResponse($item, 'virtual item', true, 200);
     }
 }

@@ -105,18 +105,17 @@ class ItemOrderController extends Controller
 
     public function orderDelete($id)
     {
-
+        DB::beginTransaction();
         try {
             $itemOrder = ItemOrder::find($id);
-            $itemOrderDetail = ItemOrderDetail::where('item_order_id', $id)->get();
-            if ($itemOrder) {
-                $itemOrder->delete();
-                $itemOrderDetail->delete();
-                return $this->apiResponse([], 'Item Order Deleted Successfully', true, 200);
-            } else {
-                return $this->apiResponse([], 'Item Order Not Found', false, 404);
-            }
+            ItemOrderDetail::where('item_order_id', $id)->delete();
+            $itemOrder->delete();
+
+
+            DB::commit();
+            return $this->apiResponse([], 'Item Order Deleted Successfully', true, 200);
         } catch (\Throwable $th) {
+            DB::rollback();
             return $this->apiResponse([], $th->getMessage(), false, 500);
         }
     }

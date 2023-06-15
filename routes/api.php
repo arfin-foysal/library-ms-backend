@@ -108,6 +108,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
 
         //Item api
         Route::get('all-item-list', [ItemController::class, 'allItemList']);
+        Route::get('get-item-for-select-field', [ItemController::class, 'getItemForSelectField']);
         Route::post('create-or-update-item', [ItemController::class, 'createOrUpdateItem']);
         Route::delete('delete-item/{id}', [ItemController::class, 'deleteItem']);
 
@@ -149,6 +150,7 @@ Route::prefix('client')->group(function () {
     Route::get("pending-order-list", [ClientController::class, 'pendingOrderList'])->middleware(['auth:sanctum']);
     Route::post("item-rent-create-client", [ItemRentController::class, 'itemRentCreate'])->middleware(['auth:sanctum']);
     Route::get("item-return-time-expired", [ClientController::class, 'ItemReturnTimeExpired'])->middleware(['auth:sanctum']);
+    Route::get("virtual-item-view/{id}", [ClientController::class, 'virtualItemView'])->middleware(['auth:sanctum']);
 });
 
 

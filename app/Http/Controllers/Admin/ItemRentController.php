@@ -255,6 +255,7 @@ class ItemRentController extends Controller
                     'item_rentals.user_id as user_id',
                     'users.name as user_name',
                     'users.profile_photo_path as user_photo',
+                    'items.isbn as isbn',
 
 
                 )->get();
@@ -286,6 +287,7 @@ class ItemRentController extends Controller
                     'item_rentals.user_id as user_id',
                     'users.name as user_name',
                     'users.profile_photo_path as user_photo',
+                    'items.isbn as isbn',
                 )
                 ->get();
 

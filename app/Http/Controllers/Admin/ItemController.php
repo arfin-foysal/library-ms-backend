@@ -43,6 +43,16 @@ class ItemController extends Controller
         return $this->apiResponse($items, 'Item List', true, 200);
     }
 
+    public function getItemForSelectField()
+    {
+        $items=Item::select('id','title','barcode_or_rfid')->get();
+        return $this->apiResponse($items, 'Item List', true, 200);
+        
+    }
+
+
+
+
 
     public function createOrUpdateItem(Request $request)
     {
@@ -134,6 +144,7 @@ class ItemController extends Controller
                     $item->is_show = $request->boolean('is_show');
                     $item->item_type = $request->item_type;
                     $item->is_free = $request->is_free;
+                    $item->barcode_or_rfid = $request->barcode_or_rfid;
                     $item->publish_date = $request->publish_date;
              
                     $item->save();
@@ -226,6 +237,7 @@ class ItemController extends Controller
                     $item->publisher_id = $request->publisher_id;
                     $item->language_id = $request->language_id;
                     $item->country_id = $request->country_id;
+                    $item->barcode_or_rfid = $request->barcode_or_rfid;
                     // $item->category_id = $request->category_id;
                     // $item->sub_category_id = $request->sub_category_id;
                     // $item->third_category_id = $request->third_category_id;

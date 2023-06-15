@@ -19,6 +19,7 @@ trait HelperTrait
 
         // Make a new order id with appending last increment + 1
         $newOrderId = 'BB' . date('Ymd') . str_pad($lastIncreament + 1, 3, 0, STR_PAD_LEFT);
+        $newOrderId++;
 
         return $newOrderId;
     }
