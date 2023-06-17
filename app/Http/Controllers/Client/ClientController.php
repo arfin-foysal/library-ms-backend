@@ -8,6 +8,7 @@ use App\Models\Author;
 use App\Models\Item;
 use App\Models\ItemAuthor;
 use App\Models\ItemRental;
+use App\Models\ItemReview;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -298,4 +299,70 @@ class ClientController extends Controller
         $item = Item::where('id', $id)->select('id', 'virtual_book')->first();
         return $this->apiResponse($item, 'virtual item', true, 200);
     }
+
+
+
+    public function reviewItem(Request $request)
+    {
+        try {
+            $request->validate([
+                'item_id' => 'required',
+                'rating' => 'required',
+                'content' => 'required',
+            ]);
+
+
+
+            $review = new ItemReview();
+            $rating = request('rating');
+            $content = request('content');
+            $userId = Auth::user()->id;
+
+            if (empty($request->id)) {
+
+                $review->user_id = $userId;
+                $review->item_id = $request->item_id;
+                $review->rating = $rating;
+                $review->content = $content;
+                $review->created_by = $userId;
+            } else {
+                $review = ItemReview::where('id', $request->id)->first();
+                $review->rating = $rating;
+                $review->content = $content;
+                $review->updated_by = $userId;
+            }
+
+            $review->save();
+            return $this->apiResponse([], 'Review Successfully.', true, 200);
+        } catch (\Throwable $th) {
+            return $this->apiResponse([], $th->getMessage(), false, 200);
+        }
+    }
+
+    public function getReviewByUser(Request $request, $id)
+    {
+        $reviews = ItemReview::where('user_id', Auth::user()->id)
+            ->where('item_id', $id)
+            ->first();
+
+        return $this->apiResponse($reviews, 'Review Successfully.', true, 200);
+    }
+
+
+    public function getReviewByItem(Request $request, $id)
+    {
+        $reviews = ItemReview::where('item_id', $id)
+            ->leftJoin('users', 'users.id', '=', 'item_reviews.user_id')
+            ->select(
+                'item_reviews.id as id',
+                'item_reviews.rating as rating',
+                'item_reviews.content as content',
+                'users.name as name',
+                'users.profile_photo_path as profile_photo_path',
+            )
+            ->get();
+
+        return $this->apiResponse($reviews, 'Review Successfully.', true, 200);
+    }
+
 }

@@ -151,10 +151,16 @@ Route::prefix('client')->group(function () {
     Route::post("item-rent-create-client", [ItemRentController::class, 'itemRentCreate'])->middleware(['auth:sanctum']);
     Route::get("item-return-time-expired", [ClientController::class, 'ItemReturnTimeExpired'])->middleware(['auth:sanctum']);
     Route::get("virtual-item-view/{id}", [ClientController::class, 'virtualItemView'])->middleware(['auth:sanctum']);
+    Route::post("review-item", [ClientController::class, 'reviewItem'])->middleware(['auth:sanctum']);
+    Route::get("get-review-by-user/{id}", [ClientController::class, 'getReviewByUser'])->middleware(['auth:sanctum']);
+    Route::get("get-review-by-item/{id}", [ClientController::class, 'getReviewByItem']);
 });
 
 
+
 Route::get('test', function () {
+
+    // dump("test");
     return "test";
 });
 
