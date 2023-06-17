@@ -13,6 +13,7 @@ use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use PhpParser\Node\Stmt\TryCatch;
 
 class ClientController extends Controller
@@ -24,11 +25,28 @@ class ClientController extends Controller
 
         $page = 0;
         $limit = $request->limit;
-        $items = Item::select(
-            'items.*',
-            'categories.name as category_name',
-        )
-            ->leftJoin('categories', 'categories.id', '=', 'items.category_id')
+        $items = Item::leftJoin('categories', 'categories.id', '=', 'items.category_id')
+            ->leftJoin('item_reviews', 'item_reviews.item_id', '=', 'items.id')
+            ->select(
+                'items.id as id',
+                'items.title as title',
+                'items.photo as photo',
+                'items.category_id as category_id',
+                'categories.name as category_name',
+                'items.updated_at as updated_at',
+
+                DB::raw('AVG(item_reviews.rating) as rating')
+
+            )
+
+            ->groupBy('items.id',
+                'items.title',
+                'items.photo',
+                'items.category_id',
+                'categories.name',
+                'items.updated_at'
+            )
+
             ->orderBy('updated_at', 'desc')->paginate($limit, ['*'], 'page', $page);
 
         foreach ($items as $item) {
@@ -47,31 +65,31 @@ class ClientController extends Controller
         return $this->apiResponse($items, 'all Book item', true, 200);
     }
     public function getHomePageBook(Request $request)
-    { {
+    {
 
-            $items = Item::select(
-                'items.*',
-                'categories.name as category_name',
-            )
-                ->leftJoin('categories', 'categories.id', '=', 'items.category_id')
-                ->latest()->limit(10)->get();
+        $items = Item::select(
+            'items.*',
+            'categories.name as category_name',
+        )
+            ->leftJoin('categories', 'categories.id', '=', 'items.category_id')
+            ->latest()->limit(10)->get();
 
-            foreach ($items as $item) {
-                $item->authors = ItemAuthor::where('item_id', $item->id)
-                    ->leftJoin('authors', 'authors.id', '=', 'item_authors.author_id')
-                    ->select(
-                        'authors.name as name',
-                        'authors.id as id',
-                        'authors.photo as author_photo',
-                        'authors.bio as author_bio'
+        foreach ($items as $item) {
+            $item->authors = ItemAuthor::where('item_id', $item->id)
+                ->leftJoin('authors', 'authors.id', '=', 'item_authors.author_id')
+                ->select(
+                    'authors.name as name',
+                    'authors.id as id',
+                    'authors.photo as author_photo',
+                    'authors.bio as author_bio'
 
-                    )
-                    ->get();
-            }
-
-            return $this->apiResponse($items, 'Book item', true, 200);
+                )
+                ->get();
         }
+
+        return $this->apiResponse($items, 'Book item', true, 200);
     }
+
 
 
 
@@ -365,4 +383,30 @@ class ClientController extends Controller
         return $this->apiResponse($reviews, 'Review Successfully.', true, 200);
     }
 
+
+    public function commonRatingCalculate()
+    {
+        // item rating calculate and get
+
+        $items = Item::leftJoin('item_reviews', 'item_reviews.item_id', '=', 'items.id')
+            ->select(
+                DB::raw('AVG(item_reviews.rating) as rating'),
+                'item_reviews.item_id as item_id',
+                'items.title as title',
+
+            )
+
+
+
+            ->groupBy(
+                'item_reviews.item_id',
+
+            )
+
+
+
+            ->get();
+
+        return $this->apiResponse($items, 'All Book item', true, 200);
+    }
 }

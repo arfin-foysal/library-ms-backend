@@ -154,6 +154,8 @@ Route::prefix('client')->group(function () {
     Route::post("review-item", [ClientController::class, 'reviewItem'])->middleware(['auth:sanctum']);
     Route::get("get-review-by-user/{id}", [ClientController::class, 'getReviewByUser'])->middleware(['auth:sanctum']);
     Route::get("get-review-by-item/{id}", [ClientController::class, 'getReviewByItem']);
+    Route::get("commonRatingCalculate", [ClientController::class, 'commonRatingCalculate']);
+
 });
 
 

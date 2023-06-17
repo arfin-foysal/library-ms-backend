@@ -51,19 +51,14 @@ class UserController extends Controller
                 }
 
 
-
-                $user = User::findOrFail($request->id);
-                $imageName = "";
+                $filename = "";
                 if ($image = $request->file('profile_photo_path')) {
-                    if ($user->profile_photo_path) {
-                        unlink(public_path("images/" . $user->profile_photo_path));
-                    }
-                    $imageName = time() . '-' . uniqid() . '.' . $image->getClientOriginalExtension();
-                    $image->move(public_path('images'), $imageName);
+                    $filename = time() . '-' . uniqid() . '.' . $image->getClientOriginalExtension();
+                    $image->move(public_path('images'), $filename);
                 } else {
-                    $imageName = $user->profile_photo_path;
+                    $filename = Null;
                 }
-
+       
 
 
                 $user = new User();
@@ -73,7 +68,7 @@ class UserController extends Controller
                 $user->password = bcrypt($request->password);
                 $user->is_active = $request->boolean('is_active');
                 $user->user_role = $request->user_role;
-                $user->profile_photo_path = $imageName;
+                $user->profile_photo_path = $filename;
                 $user->save();
 
                 return $this->apiResponse([], 'User Created Successfully', true, 200);
@@ -94,21 +89,29 @@ class UserController extends Controller
                     return $this->apiResponse([], $validator->errors(), false, 409);
                 }
 
-                $filename = "";
+                $user = User::findOrFail($request->id);
+                $imageName = "";
                 if ($image = $request->file('profile_photo_path')) {
-                    $filename = time() . '-' . uniqid() . '.' . $image->getClientOriginalExtension();
-                    $image->move(public_path('images'), $filename);
+                    if ($user->profile_photo_path) {
+                        unlink(public_path("images/" . $user->profile_photo_path));
+                    }
+                    $imageName = time() . '-' . uniqid() . '.' . $image->getClientOriginalExtension();
+                    $image->move(public_path('images'), $imageName);
                 } else {
-                    $filename = Null;
+                    $imageName = $user->profile_photo_path;
                 }
 
-                $user = User::find($request->id);
+
+
+      
+
+               
                 $user->name = $request->name;
                 $user->email = $request->email;
                 $user->phone = $request->phone;
                 $user->is_active = $request->boolean('is_active');
                 $user->user_role = $request->user_role;
-                $user->profile_photo_path = $filename;
+                $user->profile_photo_path = $imageName;
                 $user->save();
 
                 return $this->apiResponse([], 'User Updated Successfully', true, 200);
