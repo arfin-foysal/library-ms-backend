@@ -106,6 +106,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::post('create-or-update-user', [UserController::class, 'createOrUpdateUser']);
         Route::delete('delete-user/{id}', [UserController::class, 'deleteUser']);
         Route::post('reset-password', [UserController::class, 'passwordReset']);
+        
 
         //Item api
         Route::get('all-item-list', [ItemController::class, 'allItemList']);

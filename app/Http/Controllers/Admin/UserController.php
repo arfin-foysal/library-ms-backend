@@ -151,7 +151,7 @@ class UserController extends Controller
         try {
 
             $reset = User::where('id', '=', $request->id)->first();
-            $reset->password = bcrypt($request->password);
+            $reset->password = bcrypt($request->new_password);
             $reset->save();
             
             return $this->apiResponse([], 'Password Reset Successfully', true, 200);
