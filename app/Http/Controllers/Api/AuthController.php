@@ -9,16 +9,18 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Controllers\Api\withCookie;
+use App\Http\Traits\ApiResponseTrait;
+use PHPUnit\Framework\MockObject\Api;
 
 class AuthController extends Controller
 {
-    /**
-     * Create User 
-     * @param Request $request
-     * @return User
-     */
+    use ApiResponseTrait;
     public function createUser(Request $request)
     {
+
+
+
+
         try {
             //Validated
             $validateUser = Validator::make(
@@ -26,10 +28,10 @@ class AuthController extends Controller
                 [
                     'name' => 'required',
                     'email' => 'required|email|unique:users,email',
-                    // 'username' => 'required|min:4|unique:users,username',
-                    'is_active' => 'required',
+                    'username' => 'required|min:4|unique:users,username',
+                    // 'is_active' => 'required',
                     'phone' => 'required',
-                    'user_role' => 'required',
+                    // 'user_role' => 'required',
                     'password' => [
                         'required',
                         'min:6',
@@ -39,20 +41,17 @@ class AuthController extends Controller
                 ]
             );
 
+
+
             if ($validateUser->fails()) {
-                return response()->json([
-                    'status' => false,
-                    'message' => 'validation error',
-                    'errors' => $validateUser->errors()
-                ], 401);
+                return $this->apiResponse([], $validateUser->errors()->first(), false, 403);
             }
 
             $user = User::create([
                 'name' => $request->name,
                 'email' => $request->email,
-                'user_role' => $request->user_role,
+                'username' => $request->username,
                 'phone' => $request->phone,
-                'is_active' => $request->is_active,
                 'password' => Hash::make($request->password)
 
             ]);
@@ -63,20 +62,15 @@ class AuthController extends Controller
                 'token' => $user->createToken("API TOKEN")->plainTextToken,
                 'data' => []
             ], 200);
-            
         } catch (\Throwable $th) {
-            return response()->json([
-                'status' => false,
-                'message' => $th->getMessage()
-            ], 500);
+            return $this->apiResponse([], $th->getMessage(), false, 500);
         }
     }
 
-    /**
-     * Login The User and return token
-     * @param Request $request
-     * @return User
-     */
+
+
+
+
     public function loginUser(Request $request)
     {
 
@@ -90,31 +84,26 @@ class AuthController extends Controller
             );
 
             if ($validateUser->fails()) {
-                return response()->json([
-                    'status' => false,
-                    'message' => 'validation error',
-                    'errors' => $validateUser->errors()
-                ], 401);
+                return $this->apiResponse([], $validateUser->errors()->first(), false, 403);
             }
 
+
             if (!Auth::attempt($request->only(['email', 'password']))) {
-                return response()->json([
-                    'status' => false,
-                    'message' => 'Email & Password does not match with our record.',
-                    'data' => []
-                ], 401);
+                return $this->apiResponse([], 'Invalid Credentials', false, 403);
             }
             $user = User::where('email', $request->email)->first();
+
+            //only general_user can login
+            if ($user->user_role !== 'admin') {
+               
+                return $this->apiResponse([], 'Invalid Credentials', false, 403);
+            }
 
 
 
 
             if ($user->is_active !== true) {
-                return response()->json([
-                    'status' => false,
-                    'message' => 'Your account is not active. Please contact with admin.',
-                    'data' => []
-                ], 401);
+               return $this->apiResponse([], 'Your account is not active', false, 403);
             }
 
             $response_user = [
@@ -123,7 +112,7 @@ class AuthController extends Controller
                 'phone' => $user->phone,
                 'email' => $user->email,
                 'user_role' => $user->user_role,
-                'image'=>$user->image,
+                'image' => $user->image,
                 'token' => $user->createToken("API TOKEN")->plainTextToken
             ];
 
@@ -137,12 +126,12 @@ class AuthController extends Controller
 
             return response()->json($data);
         } catch (\Throwable $th) {
-            return response()->json([
-                'status' => false,
-                'message' => $th->getMessage()
-            ], 500);
+            return $this->apiResponse([], $th->getMessage(), false, 500);
         }
     }
+
+
+
     public function clientLogin(Request $request)
     {
 
@@ -156,34 +145,22 @@ class AuthController extends Controller
             );
 
             if ($validateUser->fails()) {
-                return response()->json([
-                    'status' => false,
-                    'message' => 'validation error',
-                    'errors' => $validateUser->errors()
-                ], 401);
+                return $this->apiResponse([], $validateUser->errors()->first(), false, 403);
             }
+
+
+
+
 
             if (!Auth::attempt($request->only(['email', 'password']))) {
-                return response()->json([
-                    'status' => false,
-                    'message' => 'Email & Password does not match with our record.',
-                    'data' => []
-                ], 401);
+                return $this->apiResponse([], 'Invalid Credentials', false, 403);
             }
             $user = User::where('email', $request->email)->first();
-
-          
-
-
 
 
 
             if ($user->is_active !== true) {
-                return response()->json([
-                    'status' => false,
-                    'message' => 'Your account is not active. Please contact with admin.',
-                    'data' => []
-                ], 401);
+                return $this->apiResponse([], 'Your account is not active', false, 403);
             }
 
             $response_user = [
@@ -192,7 +169,7 @@ class AuthController extends Controller
                 'phone' => $user->phone,
                 'email' => $user->email,
                 'user_role' => $user->user_role,
-                'image'=>$user->image,
+                'image' => $user->image,
                 'token' => $user->createToken("API TOKEN")->plainTextToken
             ];
 
@@ -206,10 +183,7 @@ class AuthController extends Controller
 
             return response()->json($data);
         } catch (\Throwable $th) {
-            return response()->json([
-                'status' => false,
-                'message' => $th->getMessage()
-            ], 500);
+            return $this->apiResponse([], $th->getMessage(), false, 500);
         }
     }
 }

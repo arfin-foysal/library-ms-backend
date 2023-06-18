@@ -14,6 +14,7 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
 use PhpParser\Node\Stmt\TryCatch;
 
 class ClientController extends Controller
@@ -39,7 +40,8 @@ class ClientController extends Controller
 
             )
 
-            ->groupBy('items.id',
+            ->groupBy(
+                'items.id',
                 'items.title',
                 'items.photo',
                 'items.category_id',
@@ -52,6 +54,7 @@ class ClientController extends Controller
         foreach ($items as $item) {
             $item->authors = ItemAuthor::where('item_id', $item->id)
                 ->leftJoin('authors', 'authors.id', '=', 'item_authors.author_id')
+
                 ->select(
                     'authors.name as name',
                     'authors.id as id',
@@ -67,14 +70,34 @@ class ClientController extends Controller
     public function getHomePageBook(Request $request)
     {
 
-        $items = Item::select(
-            'items.*',
-            'categories.name as category_name',
-        )
-            ->leftJoin('categories', 'categories.id', '=', 'items.category_id')
-            ->latest()->limit(10)->get();
+        $items = Item::leftJoin('categories', 'categories.id', '=', 'items.category_id')
+            ->leftJoin('item_reviews', 'item_reviews.item_id', '=', 'items.id')
+            ->select(
+                'items.id as id',
+                'items.title as title',
+                'items.photo as photo',
+                'items.category_id as category_id',
+                'categories.name as category_name',
+                'items.updated_at as updated_at',
+                DB::raw('AVG(item_reviews.rating) as rating')
+            )
+            ->groupBy(
+                'items.id',
+                'items.title',
+                'items.photo',
+                'items.category_id',
+                'categories.name',
+                'items.updated_at'
+            )
+            //->orderBy('rating', 'desc')
+            ->limit(10)
+            ->get();
 
-        foreach ($items as $item) {
+
+        $new_product = $items->sortByDesc('updated_at')->values();
+        $most_read = $items->sortByDesc('rating')->values();
+
+        foreach ($most_read as $item) {
             $item->authors = ItemAuthor::where('item_id', $item->id)
                 ->leftJoin('authors', 'authors.id', '=', 'item_authors.author_id')
                 ->select(
@@ -87,7 +110,28 @@ class ClientController extends Controller
                 ->get();
         }
 
-        return $this->apiResponse($items, 'Book item', true, 200);
+
+        foreach ($new_product as $new_item) {
+            $new_item->authors = ItemAuthor::where('item_id', $item->id)
+                ->leftJoin('authors', 'authors.id', '=', 'item_authors.author_id')
+                ->select(
+                    'authors.name as name',
+                    'authors.id as id',
+                    'authors.photo as author_photo',
+                    'authors.bio as author_bio'
+
+                )
+                ->get();
+        }
+
+        $book =
+            [
+                'most_read' => $most_read,
+                'new_product' => $new_product
+            ];
+
+
+        return $this->apiResponse($book, 'Book item', true, 200);
     }
 
 
@@ -102,17 +146,67 @@ class ClientController extends Controller
             ->leftJoin('countries', 'countries.id', '=', 'items.country_id')
             ->leftJoin('languages', 'languages.id', '=', 'items.language_id')
             ->leftJoin('item_inventory_stocks', 'item_inventory_stocks.item_id', '=', 'items.id')
+            ->leftJoin('item_reviews', 'item_reviews.item_id', '=', 'items.id')
 
             ->select(
-                'items.*',
+                'items.id',
+
+                'items.title',
+                'items.isbn',
+                'items.price',
+                'items.item_type',
+                'items.barcode_or_rfid',
+                'items.is_free',
+                'items.edition',
+                'items.number_of_page',
+                'items.summary',
+                'items.photo',
+                'items.video_url',
+                'items.brochure',
+                'items.virtual_book',
+                'items.category_id',
+                'categories.name',
+                'items.updated_at',
+                'publishers.name',
+                'countries.name',
+                'languages.name',
+
+                'item_inventory_stocks.qty',
                 'categories.name as category_name',
                 'publishers.name as publisher_name',
                 'countries.name as country_name',
                 'languages.name as language_name',
                 'item_inventory_stocks.qty as qty',
+                DB::raw('AVG(item_reviews.rating) as rating')
             )
 
+            ->groupBy(
+                'items.id',
+                'items.title',
+                'items.isbn',
+                'items.price',
+                'items.item_type',
+                'items.barcode_or_rfid',
+                'items.is_free',
+                'items.edition',
+                'items.number_of_page',
+                'items.summary',
+                'items.photo',
+                'items.video_url',
+                'items.brochure',
+                'items.virtual_book',
+                'items.category_id',
+                'categories.name',
+                'items.updated_at',
+                'publishers.name',
+                'countries.name',
+                'languages.name',
+                'item_inventory_stocks.qty'
+            )
+
+
             ->first();
+
         $items->authors = ItemAuthor::where('item_id', $items->id)
             ->leftJoin('authors', 'authors.id', '=', 'item_authors.author_id')
             ->select(
@@ -128,11 +222,25 @@ class ClientController extends Controller
         $itemByCategory = Item::where('items.category_id', $items->category_id)
             ->where('items.id', '!=', $items->id)
             ->leftJoin('categories', 'categories.id', '=', 'items.category_id')
+            ->leftJoin('item_reviews', 'item_reviews.item_id', '=', 'items.id')
             ->select(
-                'items.*',
+                'items.id as id',
+                'items.title as title',
+                'items.photo as photo',
+                'items.category_id as category_id',
                 'categories.name as category_name',
+                DB::raw('AVG(item_reviews.rating) as rating')
 
-            )->limit(2)->get();
+            )->limit(2)
+            ->groupBy(
+                'items.id',
+                'items.title',
+                'items.photo',
+                'items.category_id',
+                'categories.name'
+            )
+            ->get();
+
 
         foreach ($itemByCategory as $item) {
             $item->authors = ItemAuthor::where('item_id', $item->id)
@@ -150,6 +258,21 @@ class ClientController extends Controller
 
 
 
+        $reviews = ItemReview::where('item_id', $id)
+            ->leftJoin('users', 'users.id', '=', 'item_reviews.user_id')
+            ->select(
+                'item_reviews.id as id',
+                'item_reviews.rating as rating',
+                'item_reviews.content as content',
+                'users.name as name',
+                'users.profile_photo_path as profile_photo_path',
+            )
+            ->orderBY('item_reviews.id', 'desc')
+            ->limit(3)
+            ->get();
+
+
+        $items->reviews = $reviews;
 
 
         return $this->apiResponse($items, 'Book item', true, 200);
@@ -168,11 +291,19 @@ class ClientController extends Controller
             $author->items = ItemAuthor::where('author_id', $author->id)
                 ->leftJoin('items', 'items.id', '=', 'item_authors.item_id')
                 ->leftJoin('categories', 'categories.id', '=', 'items.category_id')
+                ->leftJoin('item_reviews', 'item_reviews.item_id', '=', 'items.id')
                 ->select(
                     'items.title as title',
                     'item_authors.item_id as item_id',
                     'items.photo as photo',
                     'categories.name as category_name',
+                    DB::raw('AVG(item_reviews.rating) as rating')
+                )
+                ->groupBy(
+                    'items.title',
+                    'item_authors.item_id',
+                    'items.photo',
+                    'categories.name'
                 )
                 ->get();
         });
@@ -197,12 +328,30 @@ class ClientController extends Controller
         try {
 
             $user = User::where('id', Auth::user()->id)->first();
-            $request->validate([
-                'name' => 'required',
-                'email' => 'required|email|unique:users,email,' . $user->id,
-                'username' => 'min:4|unique:users,username,' . $user->id,
 
-            ]);
+
+            $validateUser = Validator::make(
+                $request->all(),
+                [
+                    'name' => 'required',
+                    'email' => 'required|email|unique:users,email,' . $user->id,
+                    'username' => 'min:4|unique:users,username,' . $user->id,
+
+
+                ]
+            );
+
+            if ($validateUser->fails()) {
+                return $this->apiResponse([], $validateUser->errors()->first(), false, 403);
+            }
+
+
+
+
+
+
+
+
             $imageName = "";
             if ($image = $request->file('profile_photo_path')) {
                 if ($user->profile_photo_path) {
@@ -364,49 +513,5 @@ class ClientController extends Controller
             ->first();
 
         return $this->apiResponse($reviews, 'Review Successfully.', true, 200);
-    }
-
-
-    public function getReviewByItem(Request $request, $id)
-    {
-        $reviews = ItemReview::where('item_id', $id)
-            ->leftJoin('users', 'users.id', '=', 'item_reviews.user_id')
-            ->select(
-                'item_reviews.id as id',
-                'item_reviews.rating as rating',
-                'item_reviews.content as content',
-                'users.name as name',
-                'users.profile_photo_path as profile_photo_path',
-            )
-            ->get();
-
-        return $this->apiResponse($reviews, 'Review Successfully.', true, 200);
-    }
-
-
-    public function commonRatingCalculate()
-    {
-        // item rating calculate and get
-
-        $items = Item::leftJoin('item_reviews', 'item_reviews.item_id', '=', 'items.id')
-            ->select(
-                DB::raw('AVG(item_reviews.rating) as rating'),
-                'item_reviews.item_id as item_id',
-                'items.title as title',
-
-            )
-
-
-
-            ->groupBy(
-                'item_reviews.item_id',
-
-            )
-
-
-
-            ->get();
-
-        return $this->apiResponse($items, 'All Book item', true, 200);
     }
 }

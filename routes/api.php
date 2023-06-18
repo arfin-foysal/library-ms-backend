@@ -39,6 +39,7 @@ use Illuminate\Support\Facades\Log;
 Route::post('/auth/register', [AuthController::class, 'createUser']);
 Route::post('/auth/login', [AuthController::class, 'loginUser']);
 Route::post('/auth/client-login', [AuthController::class, 'clientLogin']);
+Route::post('/auth/client-register', [AuthController::class, 'createUser']);
 
 
 
@@ -153,8 +154,6 @@ Route::prefix('client')->group(function () {
     Route::get("virtual-item-view/{id}", [ClientController::class, 'virtualItemView'])->middleware(['auth:sanctum']);
     Route::post("review-item", [ClientController::class, 'reviewItem'])->middleware(['auth:sanctum']);
     Route::get("get-review-by-user/{id}", [ClientController::class, 'getReviewByUser'])->middleware(['auth:sanctum']);
-    Route::get("get-review-by-item/{id}", [ClientController::class, 'getReviewByItem']);
-    Route::get("commonRatingCalculate", [ClientController::class, 'commonRatingCalculate']);
 
 });
 
