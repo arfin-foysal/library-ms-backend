@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\AuthorController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\CounteryController;
+use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\ItemController;
 use App\Http\Controllers\Admin\ItemOrderController;
 use App\Http\Controllers\Admin\ItemReceiveController;
@@ -45,6 +46,12 @@ Route::post('/auth/client-register', [AuthController::class, 'createUser']);
 
 Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::prefix('admin')->group(function () {
+
+        //Dashboard Summery api
+        Route::get('/dashboard-summery', [DashboardController::class, 'dashboardSummery']);
+
+        //Dashboard Summery api
+
         // Author api
         Route::get('/all-author-list', [AuthorController::class, 'allAuthorList']);
         Route::get('/single-author/{id}', [AuthorController::class, 'singleAuthor']);
@@ -128,13 +135,14 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::get('user-list-for-book-issue', [UserController::class, 'userListforBookIssue']);
         Route::post('item-rent-create', [ItemRentController::class, 'itemRentCreate']);
         Route::get('item-and-available-qty', [ItemRentController::class, 'itemAndAvailableQty']);
-        Route::get('item-rent-list', [ItemRentController::class, 'itemRenstList']);
+        Route::get('item-rent-list', [ItemRentController::class, 'itemRentList']);
         Route::delete('item-rent-delete/{id}', [ItemRentController::class, 'deleteRentsItem']);
         Route::post('book-rent-active/{id}', [ItemRentController::class, 'bookRentActive']);
         Route::get('date-expired-item', [ItemRentController::class, 'dateExpiredItem']);
 
         //item return
         Route::post('item-return', [ItemRentController::class, 'returnItem']);
+        Route::get('item-return-list', [ItemRentController::class, 'returnList']);
         //item damage
         Route::get('item-damage-list', [ItemRentController::class, 'damagedItemList']);
     });

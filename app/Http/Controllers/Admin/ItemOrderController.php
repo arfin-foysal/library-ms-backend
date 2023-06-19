@@ -16,7 +16,6 @@ class ItemOrderController extends Controller
 
     use ApiResponseTrait;
     use HelperTrait;
-
     public function itemList()
     {
         $itemOrder = ItemOrder::leftJoin('vendors', 'vendors.id', '=', 'item_orders.vendor_id')
@@ -29,7 +28,6 @@ class ItemOrderController extends Controller
             $itemOrder[$key]->items = ItemOrderDetail::where('item_order_id', $value->id)
                 ->select('item_order_details.*', 'items.title as item_name', 'items.photo as item_photo')
                 ->leftJoin('items', 'items.id', '=', 'item_order_details.item_id')
-                // ->latest();
                 ->get();
         }
 
