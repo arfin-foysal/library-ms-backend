@@ -45,9 +45,13 @@ class ItemController extends Controller
 
     public function getItemForSelectField()
     {
-        $items=Item::select('id','title','barcode_or_rfid')->get();
+        $items = Item::leftJoin('item_inventory_stocks', 'item_inventory_stocks.item_id', '=', 'items.id')
+
+            ->select('items.id as id', 'title', 'barcode_or_rfid',
+              'item_inventory_stocks.qty as qty'
+            )
+            ->get();
         return $this->apiResponse($items, 'Item List', true, 200);
-        
     }
 
 
@@ -89,7 +93,7 @@ class ItemController extends Controller
             if ($validator->fails()) {
                 return $this->apiResponse([], $validator->errors()->first(), false, 409);
             }
-            
+
             $filename = "";
             if ($image = $request->file('photo')) {
                 $filename = time() . '-' . uniqid() . '.' . $image->getClientOriginalExtension();
@@ -119,9 +123,9 @@ class ItemController extends Controller
             try {
 
 
-                
 
-                DB::transaction(function () use ($request, $filename, $brochure,$virtual_book) {
+
+                DB::transaction(function () use ($request, $filename, $brochure, $virtual_book) {
                     $item = new Item();
                     $item->title = $request->title;
                     $item->isbn = $request->isbn;
@@ -146,7 +150,7 @@ class ItemController extends Controller
                     $item->is_free = $request->is_free;
                     $item->barcode_or_rfid = $request->barcode_or_rfid;
                     $item->publish_date = $request->publish_date;
-             
+
                     $item->save();
 
                     $authorArr = json_decode($request->author_id);

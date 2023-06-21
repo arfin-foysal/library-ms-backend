@@ -26,7 +26,9 @@ class ItemReceiveController extends Controller
     {
         $recevedOrderList = ItemReceive::leftJoin('vendors', 'vendors.id', '=', 'item_receives.vendor_id')
             ->select('item_receives.*', 'vendors.name as vendor_name')
+            ->latest('item_receives.id')
             ->get();
+        
 
         foreach ($recevedOrderList as $key => $value) {
             $recevedOrderList[$key]->items = ItemReceiveDetail::where('item_receive_id', $value->id)

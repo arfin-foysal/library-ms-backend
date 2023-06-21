@@ -150,7 +150,6 @@ class ClientController extends Controller
 
             ->select(
                 'items.id',
-
                 'items.title',
                 'items.isbn',
                 'items.price',
