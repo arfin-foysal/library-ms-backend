@@ -31,7 +31,9 @@ class ItemController extends Controller
                 'sub_categories.name as subCategoryName',
                 'third_sub_categories.name as thirdCategoryName',
             )
+            ->latest()
             ->get();
+
 
         foreach ($items as $item) {
             $item->authors = ItemAuthor::where('item_id', $item->id)
@@ -61,7 +63,7 @@ class ItemController extends Controller
     public function createOrUpdateItem(Request $request)
     {
 
-        // return $this->apiResponse($request->all(), 'Item Created Successfully', true, 200);
+
 
 
         if (empty($request->id)) {
@@ -86,12 +88,11 @@ class ItemController extends Controller
                 'is_free'  => "required",
                 'publish_status'  => "required",
 
-
-
             ]);
 
             if ($validator->fails()) {
-                return $this->apiResponse([], $validator->errors()->first(), false, 409);
+               
+                return $this->apiResponse(null, $validator->errors(), false, 400);
             }
 
             $filename = "";
@@ -117,8 +118,6 @@ class ItemController extends Controller
             } else {
                 $virtual_book = Null;
             }
-
-
 
             try {
 

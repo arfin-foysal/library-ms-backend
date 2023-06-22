@@ -21,7 +21,10 @@ class VendorController extends Controller
 
         try {
 
-            $vendor = Vendor::select('id', 'name', 'email', 'mobile', 'contact_person', 'contact_person_mobile', 'office_address', 'warehouse_address', 'primary_supply_products', 'is_active', 'photo')->get();
+            $vendor = Vendor::select('id', 'name', 'email', 'mobile', 'contact_person', 'contact_person_mobile', 'office_address', 'warehouse_address', 'primary_supply_products', 'is_active', 'photo')
+                ->orderBy('id', 'desc')
+                ->get();
+
             return $this->apiResponse($vendor, 'Vendor List', true, 200);
         } catch (\Throwable $th) {
             return $this->apiResponse([], $th->getMessage(), false, 500);
@@ -164,13 +167,16 @@ class VendorController extends Controller
         try {
 
             $vendorPayment = VendorPayment::leftJoin('vendors', 'vendor_payments.vendor_id', '=', 'vendors.id')
-                ->leftjoin('item_receives', 'vendor_payments.item_receive_id', '=', 'item_receives.id')
+                ->leftJoin('item_receives', 'vendor_payments.item_receive_id', '=', 'item_receives.id')
                 ->select(
                     'vendor_payments.*',
                     'vendors.name as vendor_name',
                     'item_receives.invoice_no as invoice_no',
                     'item_receives.payment_status as payment_status',
                 )
+
+                ->orderBy('vendor_payments.id', 'desc')
+
                 ->get();
 
 
@@ -182,51 +188,55 @@ class VendorController extends Controller
 
     public function vendorPaymentUpdate(Request $request)
     {
-        
-     
+
+
         try {
 
             DB::beginTransaction();
 
-              $vendorPayment=VendorPayment::findOrFail($request->id);
-                $vendorPayment->paid_amount=$request->paid_amount;
-                $vendorPayment->due_amount=$request->due_amount;
-                $vendorPayment->payment_through=$request->payment_through;
-                $vendorPayment->comments=$request->comments;
-                $vendorPayment->updated_by=Auth::user()->id;
-                $vendorPayment->save();
+            $vendorPayment = VendorPayment::findOrFail($request->id);
+            $vendorPayment->paid_amount = $request->paid_amount;
+            $vendorPayment->due_amount = $request->due_amount;
+            $vendorPayment->payment_through = $request->payment_through;
+            $vendorPayment->comments = $request->comments;
+            $vendorPayment->updated_by = Auth::user()->id;
+            $vendorPayment->save();
 
-        
 
-                
 
-                    $payableAmount = $vendorPayment->payable_amount;
-                    $dueAmount = $payableAmount - $vendorPayment->paid_amount;
-                    
-                    $paymentStatus = "";
 
-                    if ($dueAmount == 0) {
-                        $paymentStatus = "Paid";
-                    } else {
-                        $paymentStatus = "Due";
-                    }
 
-                    ItemReceive::where('id', $request->item_receive_id)->update([
-                        'payment_status' => $paymentStatus,
-                        'updated_by' => Auth::user()->id,
-                        'paid_amount'=>$vendorPayment->paid_amount,
-                        'due_amount'=>$vendorPayment->due_amount,
-                        
-                    ]);
-                
+            $payableAmount = $vendorPayment->payable_amount;
+            $dueAmount = $payableAmount - $vendorPayment->paid_amount;
 
-            
+            $paymentStatus = "";
+
+            if ($dueAmount == 0) {
+                $paymentStatus = "Paid";
+            } else {
+                $paymentStatus = "Due";
+            }
+
+            ItemReceive::where('id', $request->item_receive_id)->update([
+                'payment_status' => $paymentStatus,
+                'updated_by' => Auth::user()->id,
+                'paid_amount' => $vendorPayment->paid_amount,
+                'due_amount' => $vendorPayment->due_amount,
+
+            ]);
+
+
+
             DB::commit();
-            return $this->apiResponse($vendorPayment, 'Vendor Payment Updated Successfully', 
-            
-            
-            
-            true, 200);
+            return $this->apiResponse(
+                $vendorPayment,
+                'Vendor Payment Updated Successfully',
+
+
+
+                true,
+                200
+            );
         } catch (\Throwable $th) {
             DB::rollBack();
             return $this->apiResponse([], $th->getMessage(), false, 500);

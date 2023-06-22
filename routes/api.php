@@ -178,7 +178,7 @@ Route::get('test', function () {
 Route::any('{url}', function () {;
     return response()->json([
         'status' => false,
-        'message' => 'Route Not Found!',
+        'message' => 'Route Not Found! Please Check Your URL',
         'data' => []
     ], 404);
 })->where('url', '.*');

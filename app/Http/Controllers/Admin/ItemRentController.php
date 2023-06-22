@@ -53,22 +53,22 @@ class ItemRentController extends Controller
         DB::beginTransaction();
         try {
 
-            $itemRentel = new ItemRental();
-            $itemRentel->rental_no = $this->invoiceGenerator(ItemRental::class);
-            $itemRentel->rental_date = Carbon::now();
-            $itemRentel->return_date = $request->return_date;
-            $itemRentel->qty = $request->qty;
-            $itemRentel->user_id = $request->user_id;
-            $itemRentel->note = $request->note;
-            $itemRentel->created_by = Auth::user()->id;
-            $itemRentel->save();
+            $itemRant = new ItemRental();
+            $itemRant->rental_no = $this->invoiceGenerator(ItemRental::class);
+            $itemRant->rental_date = Carbon::now();
+            $itemRant->return_date = $request->return_date;
+            $itemRant->qty = $request->qty;
+            $itemRant->user_id = $request->user_id;
+            $itemRant->note = $request->note;
+            $itemRant->created_by = Auth::user()->id;
+            $itemRant->save();
 
             // ------------------- Item Rental Detail --------------------//
 
             $item = [];
             foreach ($request->items as  $value) {
                 $item[] = [
-                    'item_rental_id' => $itemRentel->id,
+                    'item_rental_id' => $itemRant->id,
                     'item_id' => $value['item_id'],
                     'item_qty' => $value['item_qty'],
                     'return_date' => $value['return_date'],
@@ -100,12 +100,12 @@ class ItemRentController extends Controller
 
     public function itemRentList()
     {
-        $itemRentelList = ItemRental::leftJoin('users', 'users.id', '=', 'item_rentals.user_id')
+        $itemRentList = ItemRental::leftJoin('users', 'users.id', '=', 'item_rentals.user_id')
             ->select('item_rentals.*', 'users.name as user_name', 'users.profile_photo_path as user_photo',)
             ->latest()
             ->get();
 
-        foreach ($itemRentelList as $item) {
+        foreach ($itemRentList as $item) {
             $item->item_rents_Detail = ItemRentalDetail::where('item_rental_id', $item->id)
 
                 ->leftJoin('items', 'items.id', '=', 'item_rental_details.item_id')
@@ -131,7 +131,7 @@ class ItemRentController extends Controller
         }
 
 
-        return $this->apiResponse($itemRentelList, 'Item Rental List', true, 200);
+        return $this->apiResponse($itemRentList, 'Item Rental List', true, 200);
     }
 
 
@@ -209,9 +209,9 @@ class ItemRentController extends Controller
 
     public function bookRentActive(Request $request, $id)
     {
-        $itemRentel = ItemRental::find($id);
-        $itemRentel->status = 'active';
-        $itemRentel->save();
+        $itemRant = ItemRental::find($id);
+        $itemRant->status = 'active';
+        $itemRant->save();
 
         return $this->apiResponse([], 'Item Rental Active Successfully', true, 200);
     }
@@ -221,8 +221,8 @@ class ItemRentController extends Controller
     {
         DB::beginTransaction();
         try {
-            $itemRentel = ItemRental::find($id);
-            $itemRentel->delete();
+            $itemRant = ItemRental::find($id);
+            $itemRant->delete();
 
             $itemRentelDetail = ItemRentalDetail::where('item_rental_id', $id)->get();
             foreach ($itemRentelDetail as $value) {
