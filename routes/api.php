@@ -163,6 +163,8 @@ Route::prefix('client')->group(function () {
     Route::get("virtual-item-view/{id}", [ClientController::class, 'virtualItemView'])->middleware(['auth:sanctum']);
     Route::post("review-item", [ClientController::class, 'reviewItem'])->middleware(['auth:sanctum']);
     Route::get("get-review-by-user/{id}", [ClientController::class, 'getReviewByUser'])->middleware(['auth:sanctum']);
+    Route::post("password-change", [UserController::class, 'passwordChange'])->middleware(['auth:sanctum']);
+    Route::delete("delete-review/{id}", [ClientController::class, 'reviewDelete'])->middleware(['auth:sanctum']);
 
 });
 

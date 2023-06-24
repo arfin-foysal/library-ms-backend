@@ -258,15 +258,22 @@ class ClientController extends Controller
 
 
         $reviews = ItemReview::where('item_id', $id)
+
+       
+
             ->leftJoin('users', 'users.id', '=', 'item_reviews.user_id')
             ->select(
                 'item_reviews.id as id',
                 'item_reviews.rating as rating',
                 'item_reviews.content as content',
+                'users.id as user_id',
                 'users.name as name',
                 'users.profile_photo_path as profile_photo_path',
             )
-            ->orderBY('item_reviews.id', 'desc')
+            //order by login user data fast show
+            ->orderBy('item_reviews.id', 'desc')
+
+
             ->limit(3)
             ->get();
 
@@ -513,4 +520,38 @@ class ClientController extends Controller
 
         return $this->apiResponse($reviews, 'Review Successfully.', true, 200);
     }
+
+
+    public function reviewDelete(Request $request, $id)
+    {
+
+
+        $review = ItemReview::where('id', $id)
+            ->where('user_id', Auth::user()->id)
+            ->first();
+        $review->delete();
+        return $this->apiResponse([], 'Review Delete Successfully.', true, 200);
+    }
+
+
+    // public function showMoreReview(Request $request, $id)
+    // {
+    //     $page = 0;
+    //     $limit = $request->limit;
+    //     $reviews = ItemReview::where('item_id', $id)
+    //         ->leftJoin('users', 'users.id', '=', 'item_reviews.user_id')
+    //         ->select(
+    //             'item_reviews.id as id',
+    //             'item_reviews.rating as rating',
+    //             'item_reviews.content as content',
+    //             'users.id as user_id',
+    //             'users.name as name',
+    //             'users.profile_photo_path as profile_photo_path',
+    //         )
+
+
+    //         ->orderBy('updated_at', 'desc')->paginate($limit, ['*'], 'page', $page)
+    //         ->get();
+    //     return $this->apiResponse($reviews, 'Review Successfully.', true, 200);
+    // }
 }

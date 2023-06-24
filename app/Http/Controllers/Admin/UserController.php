@@ -162,4 +162,36 @@ class UserController extends Controller
             return $this->apiResponse([], $th->getMessage(), false, 500);
         }
     }
+
+
+
+
+    public function passwordChange(){
+
+        //old password check
+        //new password and confirm password check
+        //update password
+
+        $password = auth()->user()->password;
+        $old_password = request()->old_password;
+        $new_password = request()->new_password;
+        $confirm_password = request()->confirm_password;
+
+        if (password_verify($old_password, $password)) {
+            if ($new_password == $confirm_password) {
+                $user = User::findOrFail(auth()->user()->id);
+                $user->password = bcrypt($new_password);
+                $user->save();
+                return $this->apiResponse([], 'Password Changed Successfully', true, 200);
+            } else {
+                return $this->apiResponse([], 'New Password and Confirm Password Not Matched', false, 409);
+            }
+        } else {
+            return $this->apiResponse([], 'Old Password Not Matched', false, 409);
+        }
+
+
+    }
+
+
 }
