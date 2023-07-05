@@ -52,8 +52,10 @@ class ItemController extends Controller
             ->select(
                 'items.id as id',
                 'items.photo as photo',
-                'title',
-                'barcode_or_rfid',
+                'items.title as title',
+                'items.barcode_or_rfid as barcode_or_rfid',
+                'items.isbn as isbn',
+                'items.edition as edition',
                 'item_inventory_stocks.qty as qty'
             )
             ->get();
@@ -66,6 +68,7 @@ class ItemController extends Controller
 
     public function createOrUpdateItem(Request $request)
     {
+      
         if (empty($request->id)) {
 
             $validator = Validator::make($request->all(), [
@@ -166,11 +169,9 @@ class ItemController extends Controller
             }
         } else {
 
-            // if($request->publish_status == "null"){
-            //     return $this->apiResponse($request->publish_status, 'Item MK - null', true, 303);
-            // }
+            
 
-            // return $this->apiResponse($request->publish_status, 'Item MK', true, 303);
+
 
             $item = Item::findOrFail($request->id);
             $imageName = "";
@@ -200,27 +201,27 @@ class ItemController extends Controller
 
                 DB::transaction(function () use ($request, $item, $brochureFile, $imageName) {
                     $item->title = $request->title;
-                    $item->isbn = $request->isbn;
+                    $item->isbn = $request->isbn=="null"?null:$request->isbn;
                     $item->photo = $imageName;
-                    $item->edition = $request->edition;
-                    $item->number_of_page = $request->number_of_page;
-                    $item->summary = $request->summary;
-                    $item->video_url = $request->video_url;
-                    $item->publisher_id = $request->publisher_id;
-                    $item->language_id = $request->language_id;
-                    $item->country_id = $request->country_id;
-                    $item->barcode_or_rfid = $request->barcode_or_rfid;
-                    $item->category_id = $request->category_id;
-                    $item->sub_category_id = $request->sub_category_id;
-                    $item->third_category_id = $request->third_category_id;
-                    $item->publish_status = $request->publish_status;
+                    $item->edition = $request->edition=="null"?null:$request->edition;
+                    $item->number_of_page = $request->number_of_page=="null"?null:$request->number_of_page;
+                    $item->summary = $request->summary=="null"?null:$request->summary;
+                    $item->video_url = $request->video_url=="null"?null:$request->video_url;
+                    $item->publisher_id = $request->publisher_id=="null"?null:$request->publisher_id;
+                    $item->language_id = $request->language_id=="null"?null:$request->language_id;
+                    $item->country_id = $request->country_id=="null"?null:$request->country_id;
+                    $item->barcode_or_rfid = $request->barcode_or_rfid=="null"?null:$request->barcode_or_rfid;
+                    $item->category_id = $request->category_id=="null"?null:$request->category_id;
+                    $item->sub_category_id = $request->sub_category_id=="null"?null:$request->sub_category_id;
+                    $item->third_category_id = $request->third_category_id=="null"?null:$request->third_category_id;
+                    $item->publish_status = $request->publish_status=="null"?null:$request->publish_status;
                     $item->updated_by = auth()->user()->id;
                     $item->brochure = $brochureFile;
-                    $item->is_active = $request->boolean('is_active');
-                    $item->is_show = $request->boolean('is_show');
+                    $item->is_active = $request->boolean('is_active')=='null'?null:$request->boolean('is_active');
+                    $item->is_show = $request->boolean('is_show')=='null'?null:$request->boolean('is_show');
                     $item->item_type = $request->item_type;
-                    $item->is_free = $request->is_free;
-                    $item->publish_date = $request->publish_date;
+                    $item->is_free = $request->is_free=="null"?null:$request->is_free;
+                    $item->publish_date = $request->publish_date=="null"?null:$request->publish_date;
                     $item->save();
                     ItemAuthor::where('item_id', $item->id)->delete();
                     $authorArr = json_decode($request->author_id);

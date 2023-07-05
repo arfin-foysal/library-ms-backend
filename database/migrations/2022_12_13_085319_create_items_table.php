@@ -21,12 +21,12 @@ class CreateItemsTable extends Migration
             $table->string('edition',100)->nullable();
             $table->string('number_of_page',50)->nullable();
             $table->text('summary')->nullable();
-            $table->string('video_url')->nullable( );
-            $table->string('brochure')->nullable( )->comment('Pdf file');
-            $table->tinyInteger('sequence',false,4)->default(0);
-            $table->boolean('is_active')->default(true);
-            $table->boolean('is_show')->default(true);
-            $table->enum('publish_status',['published','unpublished'])->default('unpublished');
+            $table->string('video_url')->nullable();
+            $table->string('brochure')->nullable()->comment('Pdf file');
+            $table->tinyInteger('sequence',false,4)->default(0)->nullable( );
+            $table->boolean('is_active')->default(true)->nullable( );
+            $table->boolean('is_show')->default(true)->nullable( );
+            $table->enum('publish_status',['published','unpublished'])->default('unpublished')->nullable();
             $table->foreignId('publisher_id')->nullable()->constrained()->onUpdate('cascade')->onDelete('cascade');
             $table->foreignId('language_id')->nullable()->constrained()->onUpdate('cascade')->onDelete('cascade');
             $table->foreignId('country_id')->nullable()->constrained()->onUpdate('cascade')->onDelete('cascade');

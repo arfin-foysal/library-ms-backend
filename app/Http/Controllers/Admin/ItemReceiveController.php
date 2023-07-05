@@ -68,7 +68,7 @@ class ItemReceiveController extends Controller
             DB::transaction(
                 function () use ($request) {
                     $itemReceive = new ItemReceive();
-                    $itemReceive->receive_no = $this->invoiceGenerator(ItemReceive::class);;
+                    $itemReceive->receive_no = $this->invoiceGenerator(ItemReceive::class);
                     $itemReceive->item_order_id = $request->item_order_id;
                     $itemReceive->vendor_id = $request->vendor_id;
                     $itemReceive->qty = $request->qty;
@@ -118,6 +118,11 @@ class ItemReceiveController extends Controller
                         }
 
                         // item price 
+                        $item = Item::find($value['item_id']);
+                        $item->price = $value['item_price'];
+                        $item->isbn=$value['isbn'];
+                        $item->edition=$value['edition'];
+                        $item->save();
                     }
 
 
@@ -126,11 +131,13 @@ class ItemReceiveController extends Controller
 
                     // item price update
 
-                    foreach ($request->order_items as $key => $value) {
-                        $item = Item::find($value['item_id']);
-                        $item->price = $value['item_price'];
-                        $item->save();
-                    }
+                    // foreach ($request->order_items as $key => $value) {
+                    //     $item = Item::find($value['item_id']);
+                    //     $item->price = $value['item_price'];
+                    //     $item->isbn=$value['isbn'];
+                    //     $item->edition=$value['edition'];
+                    //     $item->save();
+                    // }
 
 
 

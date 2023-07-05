@@ -40,6 +40,8 @@ class ItemOrderController extends Controller
     public function itemOrder(Request $request)
     {
 
+     
+
         $validator = Validator::make($request->all(), [
             // 'amount' => 'required',
             'tentative_date' => 'required',
@@ -58,12 +60,17 @@ class ItemOrderController extends Controller
             return $this->apiResponse([], $validator->errors()->first(), false, 403);
         }
 
+
+        
+
         try {
 
             DB::transaction(
                 function () use ($request) {
                     $itemOrder = new ItemOrder();
+                   
                     $itemOrder->order_no = $this->invoiceGenerator(ItemOrder::class);
+             
                     // $itemOrder->amount = $request->amount;
                     $itemOrder->tentative_date = $request->tentative_date;
                     // $itemOrder->discount = $request->discount;
@@ -72,10 +79,13 @@ class ItemOrderController extends Controller
                     $itemOrder->qty = $request->qty;
                     $itemOrder->note = $request->note;
                     $itemOrder->is_active = $request->boolean('is_active');
+                   
                     $itemOrder->created_by = auth()->user()->id;
                     $itemOrder->save();
 
                     $item = [];
+
+                
 
                     foreach ($request->order_items as  $value) {
                         $item[] = [
