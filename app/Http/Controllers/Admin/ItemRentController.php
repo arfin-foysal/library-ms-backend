@@ -22,7 +22,6 @@ class ItemRentController extends Controller
 {
     use ApiResponseTrait;
     use HelperTrait;
-
     public function itemAndAvailableQty()
     {
         $itemAndAvailableQty =
@@ -40,7 +39,6 @@ class ItemRentController extends Controller
                 'countries.name as country_name'
 
             )
-
             ->get();
         return $this->apiResponse($itemAndAvailableQty, 'Available Quantity', true, 200);
     }
@@ -48,11 +46,9 @@ class ItemRentController extends Controller
 
     public function itemRentCreate(Request $request)
     {
-        // return $request->all();
-
+       
         DB::beginTransaction();
         try {
-
             $itemRant = new ItemRental();
             $itemRant->rental_no = $this->invoiceGenerator(ItemRental::class);
             $itemRant->rental_date = Carbon::now();
@@ -115,7 +111,6 @@ class ItemRentController extends Controller
                     'items.title as item_name',
                     'items.photo as item_photo',
                 )
-
                 ->get();
 
             $item->item_rents_Detail_show = ItemRentalDetail::where('item_rental_id', $item->id)
@@ -133,9 +128,6 @@ class ItemRentController extends Controller
 
         return $this->apiResponse($itemRentList, 'Item Rental List', true, 200);
     }
-
-
-
 
     public function returnItem(Request $request)
     {
@@ -172,7 +164,10 @@ class ItemRentController extends Controller
                 //if status is not damaged then update item inventory stock
 
 
-                if ($value['status'] !== 'damaged') {
+                if (
+                    $value['status'] !== 'damaged'
+                    || $value['status'] !== 'buy'
+                ) {
                     $itemInventoryStock = ItemInventoryStock::where('item_id', $value['item_id'])->first();
                     $itemInventoryStock->qty = $itemInventoryStock->qty + $value['item_qty'];
                     $itemInventoryStock->save();
@@ -181,19 +176,19 @@ class ItemRentController extends Controller
 
 
 
-                $itemRentelDetail = ItemRentalDetail::where('item_rental_id', $request->item_rental_id)
+                $itemRenalDetail = ItemRentalDetail::where('item_rental_id', $request->item_rental_id)
                     ->where('item_id',  $value['item_id'])
                     ->first();
 
-                $itemRentelDetail->status = $value['status'];
-                $itemRentelDetail->item_amount_of_penalty = $value['item_amount_of_penalty'];
+                $itemRenalDetail->status = $value['status'];
+                $itemRenalDetail->item_amount_of_penalty = $value['item_amount_of_penalty'];
                 if ($value['item_amount_of_penalty'] == 0) {
-                    $itemRentelDetail->item_payment_status = 'nonamount';
+                    $itemRenalDetail->item_payment_status = 'nonamount';
                 } else {
-                    $itemRentelDetail->item_payment_status = 'paid';
+                    $itemRenalDetail->item_payment_status = 'paid';
                 }
 
-                $itemRentelDetail->save();
+                $itemRenalDetail->save();
             }
 
             DB::commit();
@@ -224,8 +219,8 @@ class ItemRentController extends Controller
             $itemRant = ItemRental::find($id);
             $itemRant->delete();
 
-            $itemRentelDetail = ItemRentalDetail::where('item_rental_id', $id)->get();
-            foreach ($itemRentelDetail as $value) {
+            $itemRenalDetail = ItemRentalDetail::where('item_rental_id', $id)->get();
+            foreach ($itemRenalDetail as $value) {
                 $itemInventoryStock = ItemInventoryStock::where('item_id', $value->item_id)->first();
                 $itemInventoryStock->qty = $itemInventoryStock->qty + $value->item_qty;
                 $itemInventoryStock->save();
@@ -244,7 +239,7 @@ class ItemRentController extends Controller
     {
 
         try {
-            $itemRentelDetail = ItemRentalDetail::where([['item_rental_details.return_date', '<', Carbon::now()], ['item_rental_details.status', 'rental']])
+            $itemRenalDetail = ItemRentalDetail::where([['item_rental_details.return_date', '<', Carbon::now()], ['item_rental_details.status', 'rental']])
                 ->leftJoin('items', 'items.id', '=', 'item_rental_details.item_id')
                 ->leftJoin('item_rentals', 'item_rentals.id', '=', 'item_rental_details.item_rental_id')
                 ->leftJoin('users', 'users.id', '=', 'item_rentals.user_id')
@@ -268,7 +263,7 @@ class ItemRentController extends Controller
         } catch (\Throwable $th) {
             return $this->apiResponse([], $th->getMessage(), false, 500);
         }
-        return $itemRentelDetail;
+        return $itemRenalDetail;
     }
 
 

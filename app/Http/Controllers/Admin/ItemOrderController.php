@@ -41,17 +41,17 @@ class ItemOrderController extends Controller
     {
 
         $validator = Validator::make($request->all(), [
-            'amount' => 'required',
+            // 'amount' => 'required',
             'tentative_date' => 'required',
-            'discount' => 'required',
-            'total' => 'required',
+            // 'discount' => 'required',
+            // 'total' => 'required',
             'vendor_id' => 'required',
             'note' => 'required',
             'is_active' => 'required',
             'order_items' => 'required|array',
             'order_items.*.item' => 'required',
             'order_items.*.item_qty' => 'required',
-            'order_items.*.amount' => 'required',
+            // 'order_items.*.amount' => 'required',
         ]);
 
         if ($validator->fails()) {
@@ -64,10 +64,10 @@ class ItemOrderController extends Controller
                 function () use ($request) {
                     $itemOrder = new ItemOrder();
                     $itemOrder->order_no = $this->invoiceGenerator(ItemOrder::class);
-                    $itemOrder->amount = $request->amount;
+                    // $itemOrder->amount = $request->amount;
                     $itemOrder->tentative_date = $request->tentative_date;
-                    $itemOrder->discount = $request->discount;
-                    $itemOrder->total = $request->total;
+                    // $itemOrder->discount = $request->discount;
+                    // $itemOrder->total = $request->total;
                     $itemOrder->vendor_id = $request->vendor_id;
                     $itemOrder->qty = $request->qty;
                     $itemOrder->note = $request->note;
@@ -82,8 +82,8 @@ class ItemOrderController extends Controller
                             'item_order_id' => $itemOrder->id,
                             'item_id' => $value['item'],
                             'item_qty' => $value['item_qty'],
-                            'item_price' => $value['item_price'],
-                            'total_price' => $value['amount'],
+                            // 'item_price' => $value['item_price'],
+                            // 'total_price' => $value['amount'],
                         ];
                     }
                     ItemOrderDetail::insert($item);

@@ -49,8 +49,12 @@ class ItemController extends Controller
     {
         $items = Item::leftJoin('item_inventory_stocks', 'item_inventory_stocks.item_id', '=', 'items.id')
 
-            ->select('items.id as id', 'title', 'barcode_or_rfid',
-              'item_inventory_stocks.qty as qty'
+            ->select(
+                'items.id as id',
+                'items.photo as photo',
+                'title',
+                'barcode_or_rfid',
+                'item_inventory_stocks.qty as qty'
             )
             ->get();
         return $this->apiResponse($items, 'Item List', true, 200);
@@ -62,10 +66,6 @@ class ItemController extends Controller
 
     public function createOrUpdateItem(Request $request)
     {
-
-
-
-
         if (empty($request->id)) {
 
             $validator = Validator::make($request->all(), [
@@ -83,15 +83,11 @@ class ItemController extends Controller
                 'category_id'  => "nullable|exists:categories,id",
                 'sub_category_id'  => "nullable|exists:sub_categories,id",
                 'third_category_id'  => "nullable|exists:third_sub_categories,id",
-                'item_type'  => "required|in:physical,virtual",
-                'is_active'  => "required",
-                'is_free'  => "required",
-                'publish_status'  => "required",
-
+                'item_type'  => "required|in:physical,virtual"
             ]);
 
             if ($validator->fails()) {
-               
+
                 return $this->apiResponse(null, $validator->errors(), false, 400);
             }
 
@@ -121,11 +117,9 @@ class ItemController extends Controller
 
             try {
 
-
-
-
                 DB::transaction(function () use ($request, $filename, $brochure, $virtual_book) {
                     $item = new Item();
+                    
                     $item->title = $request->title;
                     $item->isbn = $request->isbn;
                     $item->photo = $filename;
@@ -172,47 +166,23 @@ class ItemController extends Controller
             }
         } else {
 
-            // ItemAuthor::where('item_id',$itemId)->delete();
-            // $validator = Validator::make($request->all(), [
-            //     'title' => 'required|max:200|unique:items,title,' . $request->id . ',id,deleted_at,NULL',
-            //     'isbn'  => "nullable|max:100",
-            //     // 'photo'  => "nullable|mimes:jpeg,jpg,png|max:10000",
-            //     'edition'  => "nullable:max:100",
-            //     'number_of_page'  => "nullable|max:50",
-            //     'summary'  => "nullable|max:255",
-            //     'video_url'  => "nullable|max:255",
-            //     // 'brochure'  => "nullable|mimes:pdf|max:10000",
-            //     'publisher_id'  => "nullable|exists:publishers,id",
-            //     'language_id'  => "nullable|exists:languages,id",
-            //     'country_id'  => "nullable|exists:countries,id",
-            //     'category_id'  => "nullable|exists:categories,id",
-            //     'sub_category_id'  => "nullable|exists:sub_categories,id",
-            //     'third_category_id'  => "nullable|exists:third_sub_categories,id",
-            //     "author_id"   => "required|min:1",
-            //     'author_id.*' => "exists:authors,id",
-            //     'is_active'  => "required",
-            //     // 'sequence'  => "required",
-
-            // ]);
-            // if ($validator->fails()) {
-            //     return $this->apiResponse([], $validator->errors()->first(), false, 409);
+            // if($request->publish_status == "null"){
+            //     return $this->apiResponse($request->publish_status, 'Item MK - null', true, 303);
             // }
 
-            $item = Item::findOrFail($request->id);
+            // return $this->apiResponse($request->publish_status, 'Item MK', true, 303);
 
+            $item = Item::findOrFail($request->id);
             $imageName = "";
             if ($image = $request->file('photo')) {
                 if ($item->photo) {
                     unlink(public_path("images/" . $item->photo));
                 }
-
                 $imageName = time() . '-' . uniqid() . '.' . $image->getClientOriginalExtension();
                 $image->move(public_path('images'), $imageName);
             } else {
                 $imageName = $item->photo;
             }
-
-
 
             $brochureFile = "";
             if ($image = $request->file('brochure')) {
@@ -225,7 +195,6 @@ class ItemController extends Controller
             } else {
                 $brochureFile = $item->brochure;
             }
-
 
             try {
 
@@ -241,9 +210,9 @@ class ItemController extends Controller
                     $item->language_id = $request->language_id;
                     $item->country_id = $request->country_id;
                     $item->barcode_or_rfid = $request->barcode_or_rfid;
-                    // $item->category_id = $request->category_id;
-                    // $item->sub_category_id = $request->sub_category_id;
-                    // $item->third_category_id = $request->third_category_id;
+                    $item->category_id = $request->category_id;
+                    $item->sub_category_id = $request->sub_category_id;
+                    $item->third_category_id = $request->third_category_id;
                     $item->publish_status = $request->publish_status;
                     $item->updated_by = auth()->user()->id;
                     $item->brochure = $brochureFile;
@@ -253,11 +222,8 @@ class ItemController extends Controller
                     $item->is_free = $request->is_free;
                     $item->publish_date = $request->publish_date;
                     $item->save();
-
                     ItemAuthor::where('item_id', $item->id)->delete();
-
                     $authorArr = json_decode($request->author_id);
-
                     foreach ($authorArr as $key => $value) {
                         $itemAuthor = new ItemAuthor();
                         $itemAuthor->item_id = $item->id;
@@ -269,22 +235,11 @@ class ItemController extends Controller
                 DB::commit();
                 return $this->apiResponse($request->all(), 'Item Updated Successfully', true, 200);
             } catch (\Throwable $th) {
-                //throw $th;
                 DB::rollback();
                 return $this->apiResponse([], $th->getMessage(), false, 500);
             }
         }
     }
-
-    public function show($id)
-    {
-        //
-    }
-
-
-
-
-
     public function deleteItem($id)
     {
 

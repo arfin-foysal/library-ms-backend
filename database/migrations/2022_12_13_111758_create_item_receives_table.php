@@ -22,7 +22,9 @@ class CreateItemReceivesTable extends Migration
             $table->string('invoice_no', 50)->nullable()->comment('Invoice is provided by Vendor');
             $table->string('invoice_photo', 255)->nullable();
             $table->enum('payment_status', ['paid', 'unpaid', 'due'])->default('unpaid');
+            $table->float('sub_total_amount', 8, 1)->default(0)->comment('before discount amount');
             $table->float('payable_amount', 8, 1)->default(0);
+            $table->float('discount', 8, 1)->default(0);
             $table->float('paid_amount', 8, 1)->default(0);
             $table->float('due_amount', 8, 1)->default(0);
             $table->timestamp('received_date')->useCurrent()->comment('Item Order Received date');

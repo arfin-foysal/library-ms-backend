@@ -28,7 +28,7 @@ class ItemReceiveController extends Controller
             ->select('item_receives.*', 'vendors.name as vendor_name')
             ->latest('item_receives.id')
             ->get();
-        
+
 
         foreach ($recevedOrderList as $key => $value) {
             $recevedOrderList[$key]->items = ItemReceiveDetail::where('item_receive_id', $value->id)
@@ -39,7 +39,7 @@ class ItemReceiveController extends Controller
         return $this->apiResponse($recevedOrderList, 'Item Receive List', true, 200);
     }
 
-   
+
 
 
 
@@ -62,7 +62,7 @@ class ItemReceiveController extends Controller
 
     public function itemOrderReceve(Request $request)
     {
-       
+
 
         try {
             DB::transaction(
@@ -76,7 +76,9 @@ class ItemReceiveController extends Controller
                     $itemReceive->received_date = $request->received_date;
                     $itemReceive->comments = $request->comments;
                     $itemReceive->created_by = Auth::user()->id;
+                    $itemReceive->sub_total_amount=$request->amount;
                     $itemReceive->payable_amount = $request->total;
+                    $itemReceive->discount = $request->discount;
                     $itemReceive->save();
 
                     // ------------------ Item Receive Detail ------------------ //                 
@@ -117,6 +119,8 @@ class ItemReceiveController extends Controller
 
                         // item price 
                     }
+
+
                     itemReceiveDetail::insert($item);
 
 
@@ -183,7 +187,7 @@ class ItemReceiveController extends Controller
 
             );
             DB::commit();
-            return $this->apiResponse([], 'Item Receive Created', true, 200);
+            return $this->apiResponse([], 'Item Received', true, 200);
         } catch (\Throwable $th) {
             DB::rollback();
             return $this->apiResponse([], $th->getMessage(), false, 403);
