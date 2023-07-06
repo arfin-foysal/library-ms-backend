@@ -46,7 +46,7 @@ class ItemRentController extends Controller
 
     public function itemRentCreate(Request $request)
     {
-       
+
         DB::beginTransaction();
         try {
             $itemRant = new ItemRental();
@@ -57,18 +57,32 @@ class ItemRentController extends Controller
             $itemRant->user_id = $request->user_id;
             $itemRant->note = $request->note;
             $itemRant->created_by = Auth::user()->id;
+            if ($request->borrow_or_buy == 'buy') {
+                $itemRant->amount_of_buy = $request->amount_of_buy;
+                $itemRant->rent_type = 'buy';
+            }
             $itemRant->save();
 
             // ------------------- Item Rental Detail --------------------//
 
-            $item = [];
+
             foreach ($request->items as  $value) {
-                $item[] = [
-                    'item_rental_id' => $itemRant->id,
-                    'item_id' => $value['item_id'],
-                    'item_qty' => $value['item_qty'],
-                    'return_date' => $value['return_date'],
-                ];
+
+
+                $item = new ItemRentalDetail();
+                $item->item_rental_id = $itemRant->id;
+                $item->item_id = $value['item_id'];
+                $item->item_qty = $value['item_qty'];
+                $item->return_date = $value['return_date'];
+
+                if ($request->borrow_or_buy == 'buy') {
+                    $item->item_amount_of_buy = $value['price'];
+                    $item->status = 'buy';
+                }
+
+                $item->save();
+
+
 
                 // ------------------ Item Inventory Stock ------------------ //
 
@@ -84,7 +98,7 @@ class ItemRentController extends Controller
                 }
             }
 
-            ItemRentalDetail::insert($item);
+            // ItemRentalDetail::insert($item);
             DB::commit();
             return $this->apiResponse([], 'Item Rental Created Successfully', true, 200);
         } catch (\Throwable $th) {
@@ -96,7 +110,43 @@ class ItemRentController extends Controller
 
     public function itemRentList()
     {
-        $itemRentList = ItemRental::leftJoin('users', 'users.id', '=', 'item_rentals.user_id')
+        $itemRentList = ItemRental::where('rent_type', 'borrow')
+            ->leftJoin('users', 'users.id', '=', 'item_rentals.user_id')
+            ->select('item_rentals.*', 'users.name as user_name', 'users.profile_photo_path as user_photo',)
+            ->latest()
+            ->get();
+
+        foreach ($itemRentList as $item) {
+            $item->item_rents_Detail = ItemRentalDetail::where('item_rental_id', $item->id)
+
+                ->leftJoin('items', 'items.id', '=', 'item_rental_details.item_id')
+                ->where('status', 'rental')
+                ->select(
+                    'item_rental_details.*',
+                    'items.title as item_name',
+                    'items.photo as item_photo',
+                )
+                ->get();
+
+            $item->item_rents_Detail_show = ItemRentalDetail::where('item_rental_id', $item->id)
+
+                ->leftJoin('items', 'items.id', '=', 'item_rental_details.item_id')
+                // ->where('status', 'rental')
+                ->select(
+                    'item_rental_details.*',
+                    'items.title as item_name',
+                    'items.photo as item_photo',
+                )
+                ->get();
+        }
+
+
+        return $this->apiResponse($itemRentList, 'Item Rental List', true, 200);
+    }
+    public function itemBuyList()
+    {
+        $itemRentList = ItemRental::where('rent_type', 'buy')
+            ->leftJoin('users', 'users.id', '=', 'item_rentals.user_id')
             ->select('item_rentals.*', 'users.name as user_name', 'users.profile_photo_path as user_photo',)
             ->latest()
             ->get();
@@ -182,6 +232,7 @@ class ItemRentController extends Controller
 
                 $itemRenalDetail->status = $value['status'];
                 $itemRenalDetail->item_amount_of_penalty = $value['item_amount_of_penalty'];
+
                 if ($value['item_amount_of_penalty'] == 0) {
                     $itemRenalDetail->item_payment_status = 'nonamount';
                 } else {

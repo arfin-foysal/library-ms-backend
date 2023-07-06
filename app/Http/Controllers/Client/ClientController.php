@@ -32,6 +32,7 @@ class ClientController extends Controller
                 'items.id as id',
                 'items.title as title',
                 'items.photo as photo',
+                'items.price as price',
                 'items.category_id as category_id',
                 'categories.name as category_name',
                 'items.updated_at as updated_at',
@@ -41,9 +42,11 @@ class ClientController extends Controller
             )
 
             ->groupBy(
+                
                 'items.id',
                 'items.title',
                 'items.photo',
+                'items.price',
                 'items.category_id',
                 'categories.name',
                 'items.updated_at'

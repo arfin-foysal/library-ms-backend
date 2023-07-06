@@ -136,6 +136,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::post('item-rent-create', [ItemRentController::class, 'itemRentCreate']);
         Route::get('item-and-available-qty', [ItemRentController::class, 'itemAndAvailableQty']);
         Route::get('item-rent-list', [ItemRentController::class, 'itemRentList']);
+        Route::get('item-buy-list', [ItemRentController::class, 'itemBuyList']);
         Route::delete('item-rent-delete/{id}', [ItemRentController::class, 'deleteRentsItem']);
         Route::post('book-rent-active/{id}', [ItemRentController::class, 'bookRentActive']);
         Route::get('date-expired-item', [ItemRentController::class, 'dateExpiredItem']);
