@@ -52,7 +52,12 @@ class ItemReceiveController extends Controller
             ->select('item_orders.*', 'vendors.name as vendor_name')
             ->first();
         $itemReceive->items = ItemOrderDetail::where('item_order_id', $id)
-            ->select('item_order_details.*', 'items.title as item_name', 'items.photo as item_photo')
+            ->select('item_order_details.*',
+             'items.title as item_name', 
+             'items.photo as item_photo',
+             'items.isbn as isbn',
+             'items.edition as edition'
+             )
             ->leftJoin('items', 'items.id', '=', 'item_order_details.item_id')
             ->get();
 
@@ -80,9 +85,9 @@ class ItemReceiveController extends Controller
                     $itemReceive->payable_amount = $request->total;
                     $itemReceive->discount = $request->discount;
                     $itemReceive->save();
-
+                   
                     // ------------------ Item Receive Detail ------------------ //                 
-                    $item = [];
+                    // $item = [];
                     foreach ($request->order_items as  $value) {
                         $item[] = [
                             'item_receive_id' => $itemReceive->id,
@@ -105,7 +110,7 @@ class ItemReceiveController extends Controller
                                 ]
 
                             );
-                            //$request->item_qty[$key]
+
                         } else {
                             // Create new inventoryStock -------
                             ItemInventoryStock::create(
@@ -116,77 +121,33 @@ class ItemReceiveController extends Controller
                                 ],
                             );
                         }
-
-                        // item price 
-                        $item = Item::find($value['item_id']);
-                        $item->price = $value['item_price'];
-                        $item->isbn=$value['isbn'];
-                        $item->edition=$value['edition'];
-                        $item->save();
+                        $itemInfoUpdate = Item::find($value['item_id']);
+                        $itemInfoUpdate->price = $value['item_price'];
+                        $itemInfoUpdate->isbn=$value['isbn'];
+                        $itemInfoUpdate->edition=$value['edition'];
+                        $itemInfoUpdate->save();
                     }
 
+           
 
-                    itemReceiveDetail::insert($item);
-
-
-                    // item price update
-
-                    // foreach ($request->order_items as $key => $value) {
-                    //     $item = Item::find($value['item_id']);
-                    //     $item->price = $value['item_price'];
-                    //     $item->isbn=$value['isbn'];
-                    //     $item->edition=$value['edition'];
-                    //     $item->save();
-                    // }
-
-
-
-
-
-                    // ------------------ Item Inventory Stock ------------------ //
-
-                    // foreach ($request->order_items as  $value) {
-                    //     $itemInventoryStock = ItemInventoryStock::where(['item_id' => $value['item_id']])->first();
-
-                    //     $qty = $value['item_qty'] ? $value['item_qty'] : 0;
-                    //     // Update Item Qty with previous qty -------------------
-                    //     if ($itemInventoryStock) {
-                    //         $qty += $itemInventoryStock->qty;
-                    //         $itemInventoryStock->update(
-                    //             [
-                    //                 'qty' => $qty,
-                    //                 'updated_by' => Auth::user()->id,
-
-                    //             ]
-
-                    //         );
-                    //         //$request->item_qty[$key]
-                    //     } else {
-                    //         // Create new inventoryStock -------
-                    //         ItemInventoryStock::create(
-                    //             [
-                    //                 'item_id' => $value['item_id'],
-                    //                 'qty' => $qty,
-                    //                 'created_by' => Auth::user()->id,
-                    //             ],
-                    //         );
-                    //     }
-                    // }
-
-
+                    ItemReceiveDetail::insert($item);
+                    
                     // ------------------ Item Order Receved ------------------ //
                     $itemOrder = ItemOrder::find($request->item_order_id);
                     $itemOrder->order_status = "received";
                     $itemOrder->save();
                     // ------------------ Vendor Payment ------------------ //
+                
 
-                    $vandorePayment = new vendorPayment();
-                    $vandorePayment->vendor_payment_no = $this->invoiceGenerator(vendorPayment::class);
-                    $vandorePayment->vendor_id = $request->vendor_id;
-                    $vandorePayment->item_receive_id = $itemReceive->id;
-                    $vandorePayment->payable_amount = $request->total;
-                    $vandorePayment->created_by = Auth::user()->id;
-                    $vandorePayment->save();
+                   
+
+                    $vendorPayment = new vendorPayment();
+                    $vendorPayment->vendor_payment_no = $this->invoiceGenerator(vendorPayment::class);
+                    $vendorPayment->vendor_id = $request->vendor_id;
+                    $vendorPayment->item_receive_id = $itemReceive->id;
+                    $vendorPayment->payable_amount = $request->total;
+                    $vendorPayment->created_by = Auth::user()->id;
+                    $vendorPayment->save();
                 }
 
 
