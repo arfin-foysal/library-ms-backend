@@ -44,12 +44,17 @@ class ItemReceiveController extends Controller
 
 
 
-    public function unRecevedItemByOrderId(Request $request, $id)
+    public function unReceivedItemByOrderId(Request $request, $id)
     {
 
         $itemReceive = ItemOrder::where('item_orders.id', $id)
             ->leftJoin('vendors', 'vendors.id', '=', 'item_orders.vendor_id')
-            ->select('item_orders.*', 'vendors.name as vendor_name')
+            ->select('item_orders.*', 
+            'vendors.name as vendor_name',
+            'vendors.email as vendor_email',
+            'vendors.mobile as vendor_mobile',
+            'vendors.office_address as vendor_office_address',
+            )
             ->first();
         $itemReceive->items = ItemOrderDetail::where('item_order_id', $id)
             ->select('item_order_details.*',
@@ -146,6 +151,7 @@ class ItemReceiveController extends Controller
                     $vendorPayment->vendor_id = $request->vendor_id;
                     $vendorPayment->item_receive_id = $itemReceive->id;
                     $vendorPayment->payable_amount = $request->total;
+                    $vendorPayment->due_amount = $request->total;
                     $vendorPayment->created_by = Auth::user()->id;
                     $vendorPayment->save();
                 }

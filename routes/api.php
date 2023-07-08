@@ -127,7 +127,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::delete('delete-item-order/{id}', [ItemOrderController::class, 'orderDelete']);
 
         //Order receved
-        Route::get('unreceved-item-by-order-id/{id}', [ItemReceiveController::class, 'unRecevedItemByOrderId']);
+        Route::get('unreceived-item-by-order-id/{id}', [ItemReceiveController::class, 'unReceivedItemByOrderId']);
         Route::post('item-order-receved', [ItemReceiveController::class, 'itemOrderReceve']);
         Route::get('all-item-receved-list', [ItemReceiveController::class, 'recevedOrderList']);
 

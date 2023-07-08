@@ -74,6 +74,7 @@ class ItemController extends Controller
             $validator = Validator::make($request->all(), [
                 'title' => 'required|max:200|unique:items,title,NULL,id,deleted_at,NULL',
                 'isbn'  => "nullable|max:100",
+
                 'photo'  => "nullable|mimes:jpeg,jpg,png|max:10000",
                 'edition'  => "nullable:max:100",
                 'number_of_page'  => "nullable|max:50",
@@ -126,6 +127,7 @@ class ItemController extends Controller
                     $item->title = $request->title;
                     $item->isbn = $request->isbn;
                     $item->photo = $filename;
+                    $item->price = $request->price;
                     $item->edition = $request->edition;
                     $item->number_of_page = $request->number_of_page;
                     $item->summary = $request->summary;
@@ -203,6 +205,7 @@ class ItemController extends Controller
                     $item->title = $request->title;
                     $item->isbn = $request->isbn=="null"?null:$request->isbn;
                     $item->photo = $imageName;
+                    $item->price = $request->price=="null"?null:$request->price;
                     $item->edition = $request->edition=="null"?null:$request->edition;
                     $item->number_of_page = $request->number_of_page=="null"?null:$request->number_of_page;
                     $item->summary = $request->summary=="null"?null:$request->summary;
