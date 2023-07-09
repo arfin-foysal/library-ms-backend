@@ -72,6 +72,13 @@ class ItemReceiveController extends Controller
 
     public function itemOrderReceve(Request $request)
     {
+        // same received item order check
+
+        $itemReceive = ItemReceive::where('item_order_id', $request->item_order_id)->first();
+
+        if ($itemReceive) {
+            return $this->apiResponse([], 'Item Already Received', false, 400);
+        }
 
 
         try {

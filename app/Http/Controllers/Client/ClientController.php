@@ -397,6 +397,7 @@ class ClientController extends Controller
         //rent item get by login user 
 
         $items = ItemRental::where('user_id', Auth::user()->id)
+        ->where('rent_type','borrow')
             ->leftJoin('item_rental_details', 'item_rental_details.item_rental_id', '=', 'item_rentals.id')
             ->leftJoin('items', 'items.id', '=', 'item_rental_details.item_id')
             ->select(

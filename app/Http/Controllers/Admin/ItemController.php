@@ -220,8 +220,8 @@ class ItemController extends Controller
                     $item->publish_status = $request->publish_status=="null"?null:$request->publish_status;
                     $item->updated_by = auth()->user()->id;
                     $item->brochure = $brochureFile;
-                    $item->is_active = $request->boolean('is_active')=='null'?null:$request->boolean('is_active');
-                    $item->is_show = $request->boolean('is_show')=='null'?null:$request->boolean('is_show');
+                    $item->is_active = $request->boolean('is_active');
+                    $item->is_show = $request->boolean('is_show');
                     $item->item_type = $request->item_type;
                     $item->is_free = $request->is_free=="null"?null:$request->is_free;
                     $item->publish_date = $request->publish_date=="null"?null:$request->publish_date;

@@ -52,7 +52,7 @@ class ItemRentController extends Controller
             $itemRant = new ItemRental();
             $itemRant->rental_no = $this->invoiceGenerator(ItemRental::class);
             $itemRant->rental_date = Carbon::now();
-            $itemRant->return_date = $request->return_date;
+            $itemRant->return_date = Carbon::now()->addDays(7);
             $itemRant->qty = $request->qty;
             $itemRant->user_id = $request->user_id;
             $itemRant->note = $request->note;
@@ -65,10 +65,7 @@ class ItemRentController extends Controller
 
             // ------------------- Item Rental Detail --------------------//
 
-
             foreach ($request->items as  $value) {
-
-
                 $item = new ItemRentalDetail();
                 $item->item_rental_id = $itemRant->id;
                 $item->item_id = $value['item_id'];
@@ -79,11 +76,7 @@ class ItemRentController extends Controller
                     $item->item_amount_of_buy = $value['price'];
                     $item->status = 'buy';
                 }
-
                 $item->save();
-
-
-
                 // ------------------ Item Inventory Stock ------------------ //
 
 
@@ -98,12 +91,24 @@ class ItemRentController extends Controller
                 }
             }
 
-            // ItemRentalDetail::insert($item);
             DB::commit();
-            return $this->apiResponse([], 'Item Rental Created Successfully', true, 200);
+
+
+            if ($request->borrow_or_buy == "borrow") {
+                return $this->apiResponse([], '
+                Successfully Item Borrowed 
+                 Please Return Item Before Return Date' , true, 200);
+            } else if ($request->borrow_or_buy == "buy") {
+                return $this->apiResponse([], '
+                  Successfully Item Ordered
+                ', true, 200);
+            } else {
+                return $this->apiResponse([], '
+                 Successfully Item Borrowed
+                ', true, 200);
+            }
         } catch (\Throwable $th) {
             DB::rollback();
-
             return $this->apiResponse([], $th->getMessage(), false, 500);
         }
     }
